@@ -29,6 +29,8 @@ export const TicketPreviewModal: React.FC<TicketPreviewModalProps> = ({ ticket, 
         <!DOCTYPE html>
         <html>
           <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <title>${ticket.title || 'Ticket'}</title>
             <style>
               * {
@@ -44,18 +46,17 @@ export const TicketPreviewModal: React.FC<TicketPreviewModalProps> = ({ ticket, 
                 margin: 0 !important;
                 padding: 0 !important;
                 width: 100% !important;
-                max-width: 80mm !important;
                 background: #ffffff !important;
                 color: #000000 !important;
                 font-family: 'Courier New', Courier, monospace;
-                font-size: 15px !important;
+                font-size: 16px !important;
                 line-height: 1.35 !important;
               }
-              .ticket-comanda, .ticket-receipt, div[style*="max-width: 340px"] {
+              .ticket-comanda, .ticket-receipt, div[style*="max-width: 360px"], div[style*="max-width: 340px"] {
                 width: 100% !important;
                 max-width: 100% !important;
                 margin: 0 !important;
-                padding: 4px 6px !important;
+                padding: 4px 2px !important;
                 border: none !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
