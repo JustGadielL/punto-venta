@@ -4,13 +4,15 @@ import {
   Printer, 
   Save, 
   Check, 
-  Store,
-  Lock,
-  KeyRound
+  Store, 
+  Lock, 
+  KeyRound,
+  Zap
 } from 'lucide-react';
 import { SystemSettings } from '../types';
 import { api } from '../services/api';
 import { customAlert } from '../utils/alert';
+import { isAutoPrintEnabled, setAutoPrintEnabled } from '../utils/printHelper';
 
 export const SettingsView: React.FC = () => {
   const [settings, setSettings] = useState<SystemSettings>({});
@@ -18,6 +20,7 @@ export const SettingsView: React.FC = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'hardware' | 'security'>('hardware');
+  const [autoPrint, setAutoPrint] = useState<boolean>(isAutoPrintEnabled());
 
   useEffect(() => {
     loadData();
@@ -206,6 +209,30 @@ export const SettingsView: React.FC = () => {
                     />
                   </div>
                 )}
+
+                <div className="sm:col-span-2 pt-2">
+                  <label className="flex items-center gap-3 cursor-pointer bg-slate-950/80 p-4 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={autoPrint}
+                      onChange={(e) => {
+                        const val = e.target.checked;
+                        setAutoPrint(val);
+                        setAutoPrintEnabled(val);
+                      }}
+                      className="w-5 h-5 rounded text-orange-500 focus:ring-0 bg-slate-900 border-slate-700 cursor-pointer"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-amber-400" />
+                        <span className="text-sm font-bold text-white">Impresión Automática (Manos Libres)</span>
+                      </div>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Al enviar una comanda a cocina/barra o al cobrar una cuenta, se imprime de inmediato sin abrir la vista previa ni pedir confirmación manual.
+                      </p>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
           </div>

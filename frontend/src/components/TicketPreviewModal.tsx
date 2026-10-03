@@ -1,6 +1,7 @@
-import React from 'react';
-import { X, Printer, Copy, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Printer, Copy, Check, Zap } from 'lucide-react';
 import { PrintedTicket } from '../types';
+import { printTicketHtml, isAutoPrintEnabled, setAutoPrintEnabled } from '../utils/printHelper';
 
 interface TicketPreviewModalProps {
   ticket: PrintedTicket | { title?: string; content_plain?: string; content_html?: string; plainText?: string; htmlContent?: string; type?: string } | null;
@@ -10,8 +11,15 @@ interface TicketPreviewModalProps {
 
 export const TicketPreviewModal: React.FC<TicketPreviewModalProps> = ({ ticket, onClose, onPhysicalPrint }) => {
   const [copied, setCopied] = React.useState(false);
+  const [autoPrint, setAutoPrint] = useState(isAutoPrintEnabled());
 
   if (!ticket) return null;
+
+  const handleToggleAutoPrint = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.checked;
+    setAutoPrint(val);
+    setAutoPrintEnabled(val);
+  };
 
   const handleCopyText = () => {
     const textToCopy = ticket?.content_plain || (ticket as any)?.plainText;
@@ -23,81 +31,9 @@ export const TicketPreviewModal: React.FC<TicketPreviewModalProps> = ({ ticket, 
   };
 
   const handleBrowserPrint = () => {
-    const printWindow = window.open('', '_blank', 'width=400,height=600');
-    if (printWindow) {
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-            <title>${ticket.title || 'Ticket'}</title>
-            <style>
-              * {
-                box-sizing: border-box;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-              }
-              @page {
-                size: 80mm auto;
-                margin: 0;
-              }
-              html, body {
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-                background: #ffffff !important;
-                color: #000000 !important;
-                font-family: 'Courier New', Courier, monospace;
-                font-size: 16px !important;
-                line-height: 1.35 !important;
-              }
-              .ticket-comanda, .ticket-receipt, div[style*="max-width: 360px"], div[style*="max-width: 340px"] {
-                width: 100% !important;
-                max-width: 100% !important;
-                margin: 0 !important;
-                padding: 4px 2px !important;
-                border: none !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-              }
-              /* Boost font sizes for 80mm thermal roll */
-              div[style*="font-size: 15px"], div[style*="font-size: 14px"] {
-                font-size: 17px !important;
-                font-weight: 900 !important;
-              }
-              div[style*="font-size: 13px"], div[style*="font-size: 12px"] {
-                font-size: 15px !important;
-              }
-              div[style*="font-size: 11px"], div[style*="font-size: 10px"] {
-                font-size: 13px !important;
-              }
-              @media print {
-                @page {
-                  size: 80mm auto;
-                  margin: 0;
-                }
-                body {
-                  width: 80mm !important;
-                  max-width: 80mm !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                }
-              }
-            </style>
-          </head>
-          <body>
-            ${ticket.content_html || (ticket as any).htmlContent || ''}
-            <script>
-              window.onload = function() {
-                window.print();
-                setTimeout(function() { window.close(); }, 500);
-              }
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
+    const html = ticket.content_html || (ticket as any).htmlContent || '';
+    if (html) {
+      printTicketHtml(html, ticket.title || 'Ticket');
     }
   };
 
@@ -126,29 +62,44 @@ export const TicketPreviewModal: React.FC<TicketPreviewModalProps> = ({ ticket, 
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-slate-800/80 border-t border-slate-700 flex flex-wrap gap-2 justify-between items-center shrink-0">
-          <button
-            onClick={handleCopyText}
-            className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
-          >
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-            {copied ? 'Copiado' : 'Copiar Texto'}
-          </button>
+        <div className="p-4 bg-slate-800/80 border-t border-slate-700 flex flex-col gap-3 shrink-0">
+          <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300 hover:text-white select-none bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/60">
+            <input
+              type="checkbox"
+              checked={autoPrint}
+              onChange={handleToggleAutoPrint}
+              className="rounded text-orange-500 focus:ring-0 w-4 h-4 bg-slate-950 border-slate-700 cursor-pointer"
+            />
+            <span className="flex items-center gap-1.5 font-medium">
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              Imprimir en automático en futuros cobros/comandas (sin mostrar esta pantalla)
+            </span>
+          </label>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 justify-between items-center">
             <button
-              onClick={handleBrowserPrint}
-              className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs md:text-sm font-bold flex items-center gap-2 shadow-lg shadow-orange-600/30 transition-all hover:scale-105 active:scale-95"
+              onClick={handleCopyText}
+              className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
             >
-              <Printer className="w-4 h-4" />
-              Imprimir Ticket
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              {copied ? 'Copiado' : 'Copiar Texto'}
             </button>
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl text-xs md:text-sm font-semibold transition-colors"
-            >
-              Cerrar
-            </button>
+
+            <div className="flex gap-2">
+              <button
+                onClick={handleBrowserPrint}
+                className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs md:text-sm font-bold flex items-center gap-2 shadow-lg shadow-orange-600/30 transition-all hover:scale-105 active:scale-95"
+              >
+                <Printer className="w-4 h-4" />
+                Imprimir Ticket
+              </button>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl text-xs md:text-sm font-semibold transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       </div>

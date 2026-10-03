@@ -179,12 +179,12 @@ export class PrinterService {
         <div style="display: flex; flex-direction: column; gap: 6px;">
           ${items.map(it => `
             <div>
-              <div style="display: flex; justify-content: space-between;">
-                <span><b>${it.quantity}x</b> ${it.product_name}</span>
-                <span>${currency}${(it.quantity * it.unit_price).toFixed(2)}</span>
+              <div style="display: flex; justify-content: space-between; font-size: 15px;">
+                <span><b style="font-size: 16px;">${it.quantity}x</b> ${it.product_name}</span>
+                <span style="font-weight: 900;">${currency}${(it.quantity * it.unit_price).toFixed(2)}</span>
               </div>
               ${it.modifiers && it.modifiers.length > 0 ? `
-                <div style="font-size: 11px; color: #555; padding-left: 12px;">
+                <div style="font-size: 13px; font-weight: bold; color: #000; padding-left: 12px;">
                   ↳ ${(() => {
                     const countMap: Record<string, number> = {};
                     it.modifiers.forEach((m: any) => { countMap[m.modifier_name] = (countMap[m.modifier_name] || 0) + 1; });
@@ -193,60 +193,60 @@ export class PrinterService {
                 </div>
               ` : ''}
               ${it.notes && it.notes.includes('[PARA LLEVAR]') ? `
-                <div style="font-size: 11px; font-weight: bold; color: #ea580c; padding-left: 12px;">↳ [PARA LLEVAR]</div>
+                <div style="font-size: 13px; font-weight: 900; color: #000; padding-left: 12px;">↳ [PARA LLEVAR]</div>
               ` : ''}
               ${(() => {
                 const clean = (it.notes || '').replace(/\[PARA LLEVAR\]/g, '').trim();
-                return clean ? `<div style="font-size: 11px; color: #d97706; padding-left: 12px;">↳ ${clean}</div>` : '';
+                return clean ? `<div style="font-size: 13px; font-weight: bold; color: #000; padding-left: 12px;">↳ ${clean}</div>` : '';
               })()}
             </div>
           `).join('')}
         </div>
 
-        <div style="border-top: 1px dashed #888; margin: 8px 0;"></div>
-        <div style="display: flex; justify-content: space-between;">
+        <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
+        <div style="display: flex; justify-content: space-between; font-size: 14px;">
           <span>Subtotal:</span>
-          <span>${currency}${order.subtotal.toFixed(2)}</span>
+          <span style="font-weight: bold;">${currency}${order.subtotal.toFixed(2)}</span>
         </div>
         ${order.tax_amount > 0 ? `
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px;">
             <span>IVA (${order.tax_rate}%):</span>
             <span>${currency}${order.tax_amount.toFixed(2)}</span>
           </div>
         ` : ''}
         ${order.discount_amount > 0 ? `
-          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #dc2626;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; color: #000;">
             <span>Descuento:</span>
             <span>-${currency}${order.discount_amount.toFixed(2)}</span>
           </div>
         ` : ''}
         ${order.tip_amount > 0 ? `
-          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #16a34a;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; color: #000;">
             <span>Propina:</span>
             <span>${currency}${order.tip_amount.toFixed(2)}</span>
           </div>
         ` : ''}
 
-        <div style="border-top: 2px solid #222; margin: 8px 0 4px 0;"></div>
-        <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 800;">
+        <div style="border-top: 2px solid #000; margin: 8px 0 4px 0;"></div>
+        <div style="display: flex; justify-content: space-between; font-size: 19px; font-weight: 900; color: #000;">
           <span>TOTAL:</span>
           <span>${currency}${order.total.toFixed(2)}</span>
         </div>
-        <div style="border-top: 2px solid #222; margin: 4px 0 8px 0;"></div>
+        <div style="border-top: 2px solid #000; margin: 4px 0 8px 0;"></div>
 
         ${payments.length > 0 ? `
-          <div style="font-size: 11px; margin-top: 4px;">
+          <div style="font-size: 13px; margin-top: 4px;">
             ${payments.map(p => `
-              <div style="display: flex; justify-content: space-between;">
+              <div style="display: flex; justify-content: space-between; font-weight: bold;">
                 <span>Pago (${({ cash: 'EFECTIVO', card: 'TARJETA', transfer: 'TRANSFERENCIA', app: 'APLICACIÓN' } as Record<string, string>)[p.method] || String(p.method || '').toUpperCase()}):</span>
                 <span>${currency}${p.amount.toFixed(2)}</span>
               </div>
               ${p.method === 'cash' && p.amount_tendered ? `
-                <div style="display: flex; justify-content: space-between; color: #555;">
+                <div style="display: flex; justify-content: space-between; color: #000;">
                   <span>Entregado:</span>
                   <span>${currency}${p.amount_tendered.toFixed(2)}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-weight: bold; color: #15803d;">
+                <div style="display: flex; justify-content: space-between; font-weight: 900; color: #000;">
                   <span>Cambio:</span>
                   <span>${currency}${p.change_amount.toFixed(2)}</span>
                 </div>
@@ -255,11 +255,11 @@ export class PrinterService {
           </div>
         ` : ''}
 
-        <div style="border-top: 1px dashed #ccc; margin: 12px 0 8px 0;"></div>
-        <div style="text-align: center; font-size: 11px; color: #555; font-style: italic;">
+        <div style="border-top: 1px dashed #000; margin: 12px 0 8px 0;"></div>
+        <div style="text-align: center; font-size: 13px; font-weight: bold; color: #000;">
           ${footer}
         </div>
-        <div style="text-align: center; font-size: 9px; color: #888; margin-top: 6px;">
+        <div style="text-align: center; font-size: 11px; font-weight: bold; color: #000; margin-top: 6px;">
           POS-REST • Folio: ${order.id}
         </div>
       </div>
@@ -375,7 +375,7 @@ export class PrinterService {
                 ` : ''}
               </div>
               ${it.modifiers && it.modifiers.length > 0 ? `
-                <div style="padding: 2px 6px; margin-top: 3px; font-size: 13px; border-left: 2px solid #000;">
+                <div style="padding: 2px 6px; margin-top: 3px; font-size: 15px; font-weight: bold; color: #000; border-left: 3px solid #000;">
                   + ${(() => {
                     const countMap: Record<string, number> = {};
                     it.modifiers.forEach((m: any) => { countMap[m.modifier_name] = (countMap[m.modifier_name] || 0) + 1; });
@@ -386,7 +386,7 @@ export class PrinterService {
               ${(() => {
                 const clean = (it.notes || '').replace(/\[PARA LLEVAR\]/g, '').trim();
                 return clean ? `
-                  <div style="border-left: 3px solid #000; padding: 3px 6px; margin-top: 3px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
+                  <div style="border-left: 3px solid #000; padding: 3px 6px; margin-top: 3px; font-size: 15px; font-weight: 900; color: #000; text-transform: uppercase;">
                     NOTA: ${clean}
                   </div>
                 ` : '';
@@ -396,13 +396,13 @@ export class PrinterService {
         </div>
 
         ${order.notes ? `
-          <div style="margin-top: 8px; border: 2px solid #000; padding: 6px; border-radius: 4px; font-size: 12px; text-transform: uppercase;">
+          <div style="margin-top: 8px; border: 2px solid #000; padding: 6px; border-radius: 4px; font-size: 15px; font-weight: 900; color: #000; text-transform: uppercase;">
             <b>Nota general:</b> ${order.notes}
           </div>
         ` : ''}
 
         <div style="border-top: 2px dashed #000; margin: 10px 0 4px 0;"></div>
-        <div style="text-align: center; font-size: 11px; font-weight: bold;">
+        <div style="text-align: center; font-size: 13px; font-weight: 900; color: #000;">
           --- IMPRESO PARA ${areaTitle} ---
         </div>
       </div>

@@ -16,6 +16,7 @@ import { PinPad } from './components/PinPad';
 import { Category, Product, Table, Order, CashShift, PrintedTicket, ModifierGroup } from './types';
 import { api } from './services/api';
 import { getSocket } from './services/socket';
+import { printTicketHtml, isAutoPrintEnabled } from './utils/printHelper';
 
 export function App() {
   const [currentView, setCurrentView] = useState<string>('tables');
@@ -171,13 +172,25 @@ export function App() {
     setCurrentView('pos');
   };
 
+  const handleShowTicket = useCallback((ticket: any) => {
+    if (!ticket) return;
+    if (isAutoPrintEnabled()) {
+      const html = ticket.content_html || ticket.htmlContent || '';
+      if (html) {
+        printTicketHtml(html, ticket.title || 'Ticket');
+        return;
+      }
+    }
+    setTicketModal(ticket);
+  }, []);
+
   const handleCheckoutSuccess = (updatedOrder: Order, ticket: any) => {
     setCheckoutOrder(null);
     setSelectedOrderId(null); // Clear selected order so POS empties
     refreshTables();
     refreshShift();
     if (ticket) {
-      setTicketModal(ticket);
+      handleShowTicket(ticket);
     }
   };
 
@@ -210,7 +223,7 @@ export function App() {
               if (id === null) setSelectedOrderId(null);
             }}
             onOpenCheckout={setCheckoutOrder}
-            onShowTicket={setTicketModal}
+            onShowTicket={handleShowTicket}
           />
         )}
 
@@ -219,16 +232,16 @@ export function App() {
             tables={tables}
             onSelectTableForPos={handleSelectTableForPos}
             onOpenCheckout={setCheckoutOrder}
-            onShowTicket={setTicketModal}
+            onShowTicket={handleShowTicket}
           />
         )}
 
         {currentView === 'transactions' && (
-          <TransactionsView onShowTicket={setTicketModal} />
+          <TransactionsView onShowTicket={handleShowTicket} />
         )}
 
         {currentView === 'orders' && (
-          <OrdersView onSelectTableForPos={handleSelectTableForPos} onSelectOrderForPos={handleSelectOrderForPos} onOpenCheckout={setCheckoutOrder} onShowTicket={setTicketModal} />
+          <OrdersView onSelectTableForPos={handleSelectTableForPos} onSelectOrderForPos={handleSelectOrderForPos} onOpenCheckout={setCheckoutOrder} onShowTicket={handleShowTicket} />
         )}
 
         {currentView.startsWith('more') && (
@@ -240,7 +253,7 @@ export function App() {
             products={products}
             onRefreshCatalog={refreshCatalog}
             onRefreshShift={refreshShift}
-            onShowTicket={setTicketModal}
+            onShowTicket={handleShowTicket}
           />
         )}
       </main>
