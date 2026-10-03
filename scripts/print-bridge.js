@@ -43,30 +43,43 @@ socket.on('disconnect', () => {
 // Evento cuando se manda comanda a cocina/barra
 socket.on('kitchen:new_comanda', (data) => {
   console.log(`\n🔔 NUEVA COMANDA RECIBIDA: Orden #${data?.order?.order_number}`);
-  if (data?.ticket?.plainText) {
-    printToPrinter(data.ticket.plainText);
+  const text = data?.ticket?.plainText || data?.ticket?.content_plain;
+  if (text) {
+    printToPrinter(text);
   }
 });
 
-// Evento cuando se imprime cualquier ticket
+// Evento cuando se cobra una orden o se imprime cualquier ticket
 socket.on('ticket:printed', (ticket) => {
-  console.log(`📄 TICKET REGISTRADO: ${ticket.title} (Tipo: ${ticket.type})`);
+  console.log(`\n📄 TICKET RECIBIDO: ${ticket?.title || 'Ticket'} (Tipo: ${ticket?.type || 'general'})`);
+  const text = ticket?.content_plain || ticket?.plainText;
+  if (text) {
+    printToPrinter(text);
+  }
 });
 
 function printToPrinter(text) {
   if (PRINTER_IP) {
-    console.log(`Enviando a impresora de red (${PRINTER_IP}:${PRINTER_PORT})...`);
+    console.log(`Imprimiendo en Epson (${PRINTER_IP}:${PRINTER_PORT})...`);
     const client = new net.Socket();
+    client.setTimeout(4000);
     client.connect(PRINTER_PORT, PRINTER_IP, () => {
-      client.write(Buffer.from(text + '\n\n\n\x1d\x56\x00', 'utf-8')); // Texto + Corte ESC/POS
-      client.end();
-      console.log('✅ Impreso con éxito.');
+      const init = Buffer.from([0x1b, 0x40]); // ESC @ Inicializar
+      const body = Buffer.from(text + '\n\n\n\n', 'latin1');
+      const cut = Buffer.from([0x1d, 0x56, 0x41, 0x03]); // GS V A 3 Corte automático
+      client.write(Buffer.concat([init, body, cut]), () => {
+        client.end();
+        console.log('✅ Impreso y cortado físicamente.');
+      });
     });
     client.on('error', (err) => {
-      console.error('❌ Error enviando a la impresora física:', err.message);
+      console.error('❌ Error enviando a la impresora:', err.message);
+    });
+    client.on('timeout', () => {
+      console.error('❌ Tiempo de espera agotado al conectar a la impresora');
+      client.destroy();
     });
   } else {
-    console.log('ℹ️ [MODO SIMULACIÓN] Texto que saldría en la impresora física:\n');
-    console.log(text);
+    console.log('ℹ️ [MODO SIMULACIÓN] Texto:\n', text);
   }
 }
