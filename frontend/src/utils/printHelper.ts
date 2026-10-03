@@ -32,25 +32,38 @@ export function printTicketHtml(htmlContent: string, title: string = 'Ticket') {
             width: 100% !important;
             background: #ffffff !important;
             color: #000000 !important;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px !important;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+            font-size: 18px !important;
             line-height: 1.35 !important;
+            font-weight: 800 !important;
+            -webkit-font-smoothing: antialiased;
           }
-          .ticket-comanda, .ticket-receipt, .ticket-corte, div[style*="max-width: 360px"], div[style*="max-width: 340px"] {
+          .ticket-comanda, .ticket-receipt, .ticket-corte, div[style*="max-width: 360px"], div[style*="max-width: 380px"], div[style*="max-width: 340px"] {
             width: 100% !important;
             max-width: 100% !important;
             margin: 0 !important;
-            padding: 4px 2px !important;
+            padding: 6px 2px !important;
             border: none !important;
             box-shadow: none !important;
             border-radius: 0 !important;
+            background: transparent !important;
           }
-          div[style*="font-size: 15px"], div[style*="font-size: 14px"] {
-            font-size: 17px !important;
-            font-weight: 900 !important;
-          }
-          div[style*="font-size: 13px"], div[style*="font-size: 12px"] {
+          /* Proportionally scale font sizes so thermal prints are clear and bold */
+          div[style*="font-size: 11px"], div[style*="font-size: 12px"] {
             font-size: 15px !important;
+            font-weight: 800 !important;
+          }
+          div[style*="font-size: 13px"], div[style*="font-size: 14px"] {
+            font-size: 16px !important;
+            font-weight: 800 !important;
+          }
+          div[style*="font-size: 15px"], div[style*="font-size: 16px"] {
+            font-size: 18px !important;
+            font-weight: 800 !important;
+          }
+          div[style*="font-size: 17px"], div[style*="font-size: 18px"] {
+            font-size: 20px !important;
+            font-weight: 900 !important;
           }
           @media print {
             @page {

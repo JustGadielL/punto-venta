@@ -152,39 +152,39 @@ export class PrinterService {
 
     // 2. HTML Representation for modern visual preview in app
     const htmlContent = `
-      <div class="ticket-receipt" style="font-family: 'Courier New', Courier, monospace; width: 100%; max-width: 360px; margin: 0 auto; padding: 10px 4px; background: #fff; color: #111; font-size: 15px; line-height: 1.35;">
-        <div style="text-align: center; font-weight: 900; font-size: 18px; margin-bottom: 4px;">${restName}</div>
-        ${address ? `<div style="text-align: center; font-size: 12px; color: #333;">${address}</div>` : ''}
-        ${phone ? `<div style="text-align: center; font-size: 12px; color: #333;">Tel: ${phone}</div>` : ''}
-        ${rfc ? `<div style="text-align: center; font-size: 12px; color: #333;">RFC: ${rfc}</div>` : ''}
-        <div style="border-top: 2px dashed #000; margin: 8px 0;"></div>
+      <div class="ticket-receipt" style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; width: 100%; max-width: 380px; margin: 0 auto; padding: 10px 4px; background: #fff; color: #000; font-size: 17px; line-height: 1.35; font-weight: 700;">
+        <div style="text-align: center; font-weight: 900; font-size: 22px; margin-bottom: 4px; text-transform: uppercase;">${restName}</div>
+        ${address ? `<div style="text-align: center; font-size: 14px; font-weight: 800; color: #000;">${address}</div>` : ''}
+        ${phone ? `<div style="text-align: center; font-size: 14px; font-weight: 800; color: #000;">Tel: ${phone}</div>` : ''}
+        ${rfc ? `<div style="text-align: center; font-size: 14px; font-weight: 800; color: #000;">RFC: ${rfc}</div>` : ''}
+        <div style="border-top: 3px dashed #000; margin: 8px 0;"></div>
         
-        <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 16px;">
+        <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 19px;">
           <span>TICKET #${order.order_number}</span>
           <span>${dateStr}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 14px; margin-top: 3px; font-weight: bold;">
+        <div style="display: flex; justify-content: space-between; font-size: 16px; margin-top: 3px; font-weight: 900;">
           <span>${dest}</span>
           <span>Folio: ${order.id}</span>
         </div>
-        ${order.customer_name ? `<div style="font-size: 14px; margin-top: 3px;">Cliente: <b>${order.customer_name}</b></div>` : ''}
+        ${order.customer_name ? `<div style="font-size: 16px; margin-top: 3px; font-weight: 900;">Cliente: <b>${order.customer_name}</b></div>` : ''}
         
-        <div style="border-top: 2px dashed #000; margin: 8px 0;"></div>
-        <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 13px; text-transform: uppercase;">
+        <div style="border-top: 3px dashed #000; margin: 8px 0;"></div>
+        <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 16px; text-transform: uppercase;">
           <span>Cant. / Producto</span>
           <span>Importe</span>
         </div>
-        <div style="border-top: 1px dashed #000; margin: 4px 0 8px 0;"></div>
+        <div style="border-top: 2px dashed #000; margin: 4px 0 8px 0;"></div>
 
-        <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
           ${items.map(it => `
             <div>
-              <div style="display: flex; justify-content: space-between; font-size: 15px;">
-                <span><b style="font-size: 16px;">${it.quantity}x</b> ${it.product_name}</span>
+              <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 800;">
+                <span><b style="font-size: 20px; font-weight: 900;">${it.quantity}x</b> ${it.product_name}</span>
                 <span style="font-weight: 900;">${currency}${(it.quantity * it.unit_price).toFixed(2)}</span>
               </div>
               ${it.modifiers && it.modifiers.length > 0 ? `
-                <div style="font-size: 13px; font-weight: bold; color: #000; padding-left: 12px;">
+                <div style="font-size: 15px; font-weight: 800; color: #000; padding-left: 12px; margin-top: 2px;">
                   ↳ ${(() => {
                     const countMap: Record<string, number> = {};
                     it.modifiers.forEach((m: any) => { countMap[m.modifier_name] = (countMap[m.modifier_name] || 0) + 1; });
@@ -193,51 +193,51 @@ export class PrinterService {
                 </div>
               ` : ''}
               ${it.notes && it.notes.includes('[PARA LLEVAR]') ? `
-                <div style="font-size: 13px; font-weight: 900; color: #000; padding-left: 12px;">↳ [PARA LLEVAR]</div>
+                <div style="font-size: 15px; font-weight: 900; color: #000; padding-left: 12px; margin-top: 2px;">↳ [PARA LLEVAR]</div>
               ` : ''}
               ${(() => {
                 const clean = (it.notes || '').replace(/\[PARA LLEVAR\]/g, '').trim();
-                return clean ? `<div style="font-size: 13px; font-weight: bold; color: #000; padding-left: 12px;">↳ ${clean}</div>` : '';
+                return clean ? `<div style="font-size: 15px; font-weight: 800; color: #000; padding-left: 12px; margin-top: 2px;">↳ ${clean}</div>` : '';
               })()}
             </div>
           `).join('')}
         </div>
 
-        <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
-        <div style="display: flex; justify-content: space-between; font-size: 14px;">
+        <div style="border-top: 2px dashed #000; margin: 8px 0;"></div>
+        <div style="display: flex; justify-content: space-between; font-size: 17px; font-weight: 800;">
           <span>Subtotal:</span>
-          <span style="font-weight: bold;">${currency}${order.subtotal.toFixed(2)}</span>
+          <span style="font-weight: 900;">${currency}${order.subtotal.toFixed(2)}</span>
         </div>
         ${order.tax_amount > 0 ? `
-          <div style="display: flex; justify-content: space-between; font-size: 13px;">
+          <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 800;">
             <span>IVA (${order.tax_rate}%):</span>
             <span>${currency}${order.tax_amount.toFixed(2)}</span>
           </div>
         ` : ''}
         ${order.discount_amount > 0 ? `
-          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; color: #000;">
+          <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; color: #000;">
             <span>Descuento:</span>
             <span>-${currency}${order.discount_amount.toFixed(2)}</span>
           </div>
         ` : ''}
         ${order.tip_amount > 0 ? `
-          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; color: #000;">
+          <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; color: #000;">
             <span>Propina:</span>
             <span>${currency}${order.tip_amount.toFixed(2)}</span>
           </div>
         ` : ''}
 
-        <div style="border-top: 2px solid #000; margin: 8px 0 4px 0;"></div>
-        <div style="display: flex; justify-content: space-between; font-size: 19px; font-weight: 900; color: #000;">
+        <div style="border-top: 3px solid #000; margin: 10px 0 4px 0;"></div>
+        <div style="display: flex; justify-content: space-between; font-size: 24px; font-weight: 900; color: #000;">
           <span>TOTAL:</span>
           <span>${currency}${order.total.toFixed(2)}</span>
         </div>
-        <div style="border-top: 2px solid #000; margin: 4px 0 8px 0;"></div>
+        <div style="border-top: 3px solid #000; margin: 4px 0 10px 0;"></div>
 
         ${payments.length > 0 ? `
-          <div style="font-size: 13px; margin-top: 4px;">
+          <div style="font-size: 15px; margin-top: 4px; font-weight: 800;">
             ${payments.map(p => `
-              <div style="display: flex; justify-content: space-between; font-weight: bold;">
+              <div style="display: flex; justify-content: space-between; font-weight: 900;">
                 <span>Pago (${({ cash: 'EFECTIVO', card: 'TARJETA', transfer: 'TRANSFERENCIA', app: 'APLICACIÓN' } as Record<string, string>)[p.method] || String(p.method || '').toUpperCase()}):</span>
                 <span>${currency}${p.amount.toFixed(2)}</span>
               </div>
@@ -255,11 +255,11 @@ export class PrinterService {
           </div>
         ` : ''}
 
-        <div style="border-top: 1px dashed #000; margin: 12px 0 8px 0;"></div>
-        <div style="text-align: center; font-size: 13px; font-weight: bold; color: #000;">
+        <div style="border-top: 2px dashed #000; margin: 12px 0 8px 0;"></div>
+        <div style="text-align: center; font-size: 15px; font-weight: 900; color: #000;">
           ${footer}
         </div>
-        <div style="text-align: center; font-size: 11px; font-weight: bold; color: #000; margin-top: 6px;">
+        <div style="text-align: center; font-size: 13px; font-weight: 800; color: #000; margin-top: 6px;">
           POS-REST • Folio: ${order.id}
         </div>
       </div>
@@ -347,35 +347,35 @@ export class PrinterService {
     const plainText = lines.join('\n');
 
     const htmlContent = `
-      <div class="ticket-comanda" style="font-family: 'Courier New', Courier, monospace; width: 100%; max-width: 360px; margin: 0 auto; padding: 8px 4px; background: #fff; color: #000; font-size: 15px; line-height: 1.35; page-break-after: always; break-after: page;">
-        <div style="background: ${headerBg}; color: #fff; text-align: center; font-weight: 900; font-size: 18px; padding: 8px 4px; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+      <div class="ticket-comanda" style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; width: 100%; max-width: 380px; margin: 0 auto; padding: 8px 4px; background: #fff; color: #000; font-size: 17px; line-height: 1.35; font-weight: 700; page-break-after: always; break-after: page;">
+        <div style="border: 3px solid #000; background: transparent; color: #000; text-align: center; font-weight: 900; font-size: 26px; padding: 6px 4px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px;">
           ${areaTitle}
         </div>
-        <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 17px;">
+        <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 19px;">
           <span>ORDEN #${order.order_number}</span>
           <span>${timeStr}</span>
         </div>
-        <div style="border: 2px solid #000; padding: 8px; margin: 8px 0; border-radius: 6px; font-weight: 900; font-size: 18px; text-align: center; text-transform: uppercase;">
+        <div style="border: 3px solid #000; background: transparent; padding: 8px; margin: 8px 0; border-radius: 6px; font-weight: 900; font-size: 22px; text-align: center; text-transform: uppercase;">
           ${dest}
         </div>
-        ${order.customer_name ? `<div style="font-size: 14px; margin-bottom: 4px; font-weight: bold;">Cliente: <b>${order.customer_name}</b></div>` : ''}
+        ${order.customer_name ? `<div style="font-size: 16px; margin-bottom: 4px; font-weight: 900;">Cliente: <b>${order.customer_name}</b></div>` : ''}
         
-        <div style="border-top: 2px dashed #000; margin: 8px 0;"></div>
+        <div style="border-top: 3px dashed #000; margin: 8px 0;"></div>
 
         <div style="display: flex; flex-direction: column; gap: 8px;">
           ${items.map(it => `
-            <div style="border-bottom: 1px dashed #000; padding-bottom: 6px;">
-              <div style="font-size: 17px; font-weight: 900; display: flex; align-items: center; justify-content: space-between;">
+            <div style="border-bottom: 2px dashed #000; padding-bottom: 8px;">
+              <div style="font-size: 20px; font-weight: 900; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
                 <div>
-                  <span style="background: #000; color: #fff; padding: 2px 8px; border-radius: 4px; margin-right: 6px; font-weight: 900;">${it.quantity}x</span>
+                  <span style="border: 2px solid #000; background: transparent; color: #000; padding: 2px 8px; border-radius: 4px; margin-right: 6px; font-weight: 900; font-size: 22px;">${it.quantity}x</span>
                   ${it.product_name}
                 </div>
                 ${it.notes && it.notes.includes('[PARA LLEVAR]') ? `
-                  <span style="background: #ea580c; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 900; letter-spacing: 0.5px;">PARA LLEVAR</span>
+                  <span style="border: 2px solid #000; background: transparent; color: #000; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-weight: 900; white-space: nowrap;">[LLEVAR]</span>
                 ` : ''}
               </div>
               ${it.modifiers && it.modifiers.length > 0 ? `
-                <div style="padding: 2px 6px; margin-top: 3px; font-size: 15px; font-weight: bold; color: #000; border-left: 3px solid #000;">
+                <div style="padding: 3px 8px; margin-top: 4px; font-size: 17px; font-weight: 800; color: #000; border-left: 3px solid #000; margin-left: 6px;">
                   + ${(() => {
                     const countMap: Record<string, number> = {};
                     it.modifiers.forEach((m: any) => { countMap[m.modifier_name] = (countMap[m.modifier_name] || 0) + 1; });
@@ -386,7 +386,7 @@ export class PrinterService {
               ${(() => {
                 const clean = (it.notes || '').replace(/\[PARA LLEVAR\]/g, '').trim();
                 return clean ? `
-                  <div style="border-left: 3px solid #000; padding: 3px 6px; margin-top: 3px; font-size: 15px; font-weight: 900; color: #000; text-transform: uppercase;">
+                  <div style="border-left: 3px solid #000; padding: 4px 8px; margin-top: 4px; font-size: 17px; font-weight: 900; color: #000; text-transform: uppercase; margin-left: 6px;">
                     NOTA: ${clean}
                   </div>
                 ` : '';
@@ -396,14 +396,14 @@ export class PrinterService {
         </div>
 
         ${order.notes ? `
-          <div style="margin-top: 8px; border: 2px solid #000; padding: 6px; border-radius: 4px; font-size: 15px; font-weight: 900; color: #000; text-transform: uppercase;">
+          <div style="margin-top: 10px; border: 2px solid #000; padding: 8px; border-radius: 6px; font-size: 17px; font-weight: 900; color: #000; text-transform: uppercase;">
             <b>Nota general:</b> ${order.notes}
           </div>
         ` : ''}
 
-        <div style="border-top: 2px dashed #000; margin: 10px 0 4px 0;"></div>
-        <div style="text-align: center; font-size: 13px; font-weight: 900; color: #000;">
-          --- IMPRESO PARA ${areaTitle} ---
+        <div style="border-top: 3px dashed #000; margin: 12px 0 6px 0;"></div>
+        <div style="text-align: center; font-size: 15px; font-weight: 900; color: #000;">
+          --- FIN DE COMANDA ${areaTitle} ---
         </div>
       </div>
     `;
