@@ -333,14 +333,23 @@ function seedInitialData() {
     seedTables();
   }
 
-  // Create an initial open cash shift if none exists so testing is instant
+  // Create an initial open cash shift if none exists with $0.00
   const shiftCount = db.prepare('SELECT COUNT(*) as count FROM cash_shifts').get() as { count: number };
   if (shiftCount.count === 0) {
     db.prepare(`
       INSERT INTO cash_shifts (cashier_name, initial_amount, status, notes)
       VALUES (?, ?, 'open', ?)
-    `).run('Cajero Principal', 500.00, 'Turno inicial de apertura');
+    `).run('Cajero Principal', 0.00, 'Turno inicial de apertura');
   }
+
+  // Migration: Ensure any shift created with 500 starts at 0.00
+  try {
+    db.prepare(`
+      UPDATE cash_shifts
+      SET initial_amount = 0.00
+      WHERE initial_amount = 500.00 AND (notes = 'Turno inicial de apertura' OR total_sales = 0)
+    `).run();
+  } catch (e) {}
 
   // Migration: Ensure table_name exists in orders
   try {

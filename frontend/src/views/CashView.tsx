@@ -47,7 +47,7 @@ export const CashView: React.FC<CashViewProps> = ({
 
   // Open Shift form
   const [cashierName, setCashierName] = useState<string>('Cajero Principal');
-  const [initialAmount, setInitialAmount] = useState<string>('500');
+  const [initialAmount, setInitialAmount] = useState<string>('0');
   const [openNotes, setOpenNotes] = useState<string>('');
 
   // Movement form
