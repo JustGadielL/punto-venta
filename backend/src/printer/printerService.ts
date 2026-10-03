@@ -84,8 +84,15 @@ export class PrinterService {
       ? (order.table_name ? (order.table_name.toLowerCase().startsWith('mesa') ? order.table_name.toUpperCase() : `MESA: ${order.table_name.toUpperCase()}`) : (order.table_number ? `MESA: ${order.table_number}` : 'MESA S/N'))
       : (order.type === 'take_out' ? 'PARA LLEVAR' : 'APP');
     lines.push(this.formatLine(`TIPO: ${dest}`, `ORDEN #${order.id}`, width));
-    if (order.customer_name) lines.push(`CLIENTE: ${order.customer_name}`);
-    lines.push(this.formatDivider('-', width));
+
+    const clientDisplayName = (order.customer_name && order.customer_name.trim().length > 0)
+      ? order.customer_name.trim().toUpperCase()
+      : (order.type === 'dine_in'
+          ? (order.table_name ? order.table_name.toUpperCase() : `MESA ${order.table_number || 'S/N'}`)
+          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : 'DELIVERY / APP'));
+    lines.push(this.formatDivider('=', width));
+    lines.push(this.formatCenter(`CLIENTE: ${clientDisplayName}`, width));
+    lines.push(this.formatDivider('=', width));
 
     lines.push(this.formatLine('CANT PRODUCTO', 'TOTAL', width));
     lines.push(this.formatDivider('-', width));
@@ -167,9 +174,14 @@ export class PrinterService {
           <span>${dest}</span>
           <span>Folio: ${order.id}</span>
         </div>
-        ${order.customer_name ? `<div style="font-size: 16px; margin-top: 3px; font-weight: 900;">Cliente: <b>${order.customer_name}</b></div>` : ''}
-        
-        <div style="border-top: 3px dashed #000; margin: 8px 0;"></div>
+        <div style="border-top: 3px solid #000; margin: 8px 0 4px 0;"></div>
+        <div style="text-align: center; padding: 4px 0;">
+          <span style="font-size: 15px; font-weight: 900; letter-spacing: 1px;">CLIENTE:</span>
+          <div style="font-size: 26px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1.2; margin-top: 2px;">
+            ${clientDisplayName}
+          </div>
+        </div>
+        <div style="border-top: 3px solid #000; margin: 4px 0 8px 0;"></div>
         <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 16px; text-transform: uppercase;">
           <span>Cant. / Producto</span>
           <span>Importe</span>
@@ -302,19 +314,25 @@ export class PrinterService {
     const isKitchen = area === 'COCINA';
     const areaTitle = isKitchen ? 'COCINA' : 'BARRA';
     const itemColHeader = isKitchen ? 'PLATILLO / ESPECIFICACIÓN' : 'BEBIDA / ESPECIFICACIÓN';
-    const headerBg = isKitchen ? '#0f172a' : '#312e81';
     const title = `Comanda ${isKitchen ? 'Cocina' : 'Barra'} #${order.order_number}`;
 
+    const clientDisplayName = (order.customer_name && order.customer_name.trim().length > 0)
+      ? order.customer_name.trim().toUpperCase()
+      : (order.type === 'dine_in'
+          ? (order.table_name ? order.table_name.toUpperCase() : `MESA ${order.table_number || 'S/N'}`)
+          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : 'DELIVERY / APP'));
+
     const lines: string[] = [];
-    lines.push(this.formatCenter('==============================', width));
-    lines.push(this.formatCenter(`>>> COMANDA ${areaTitle} <<<`, width));
-    lines.push(this.formatCenter('==============================', width));
+    lines.push(this.formatDivider('=', width));
+    lines.push(this.formatCenter(`*** ${areaTitle} ***`, width));
+    lines.push(this.formatDivider('=', width));
     lines.push(this.formatLine(`ORDEN: #${order.order_number}`, `HORA: ${timeStr}`, width));
     lines.push(this.formatLine(`DESTINO: ${dest}`, `FOLIO: ${order.id}`, width));
-    if (order.customer_name) lines.push(`CLIENTE: ${order.customer_name}`);
-    lines.push(this.formatDivider('-', width));
-    lines.push(this.formatLine('CANT', itemColHeader, width));
     lines.push(this.formatDivider('=', width));
+    lines.push(this.formatCenter(`CLIENTE: ${clientDisplayName}`, width));
+    lines.push(this.formatDivider('=', width));
+    lines.push(this.formatLine('CANT', itemColHeader, width));
+    lines.push(this.formatDivider('-', width));
 
     for (const item of items) {
       lines.push(`[ ] ${item.quantity}x ${item.product_name.toUpperCase()}`);
@@ -348,9 +366,12 @@ export class PrinterService {
 
     const htmlContent = `
       <div class="ticket-comanda" style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; width: 100%; max-width: 380px; margin: 0 auto; padding: 8px 4px; background: #fff; color: #000; font-size: 17px; line-height: 1.35; font-weight: 700; page-break-after: always; break-after: page;">
-        <div style="border: 3px solid #000; background: transparent; color: #000; text-align: center; font-weight: 900; font-size: 26px; padding: 6px 4px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px;">
-          ${areaTitle}
+        <div style="border-top: 3px solid #000; margin: 4px 0 2px 0;"></div>
+        <div style="text-align: center; font-weight: 900; font-size: 32px; letter-spacing: 3px; text-transform: uppercase; padding: 4px 0; color: #000;">
+          *** ${areaTitle} ***
         </div>
+        <div style="border-top: 3px solid #000; margin: 2px 0 10px 0;"></div>
+        
         <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 19px;">
           <span>ORDEN #${order.order_number}</span>
           <span>${timeStr}</span>
@@ -358,9 +379,15 @@ export class PrinterService {
         <div style="border: 3px solid #000; background: transparent; padding: 8px; margin: 8px 0; border-radius: 6px; font-weight: 900; font-size: 22px; text-align: center; text-transform: uppercase;">
           ${dest}
         </div>
-        ${order.customer_name ? `<div style="font-size: 16px; margin-bottom: 4px; font-weight: 900;">Cliente: <b>${order.customer_name}</b></div>` : ''}
         
-        <div style="border-top: 3px dashed #000; margin: 8px 0;"></div>
+        <div style="border-top: 3px solid #000; margin: 8px 0 4px 0;"></div>
+        <div style="text-align: center; padding: 4px 0;">
+          <span style="font-size: 15px; font-weight: 900; letter-spacing: 1px;">CLIENTE:</span>
+          <div style="font-size: 26px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1.2; margin-top: 2px;">
+            ${clientDisplayName}
+          </div>
+        </div>
+        <div style="border-top: 3px solid #000; margin: 4px 0 8px 0;"></div>
 
         <div style="display: flex; flex-direction: column; gap: 8px;">
           ${items.map(it => `

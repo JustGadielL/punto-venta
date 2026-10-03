@@ -548,59 +548,74 @@ export const PosView: React.FC<PosViewProps> = ({
           </div>
 
           {/* Table / Customer Selector */}
-          <div className="grid grid-cols-2 gap-2">
-            {orderType === 'dine_in' ? (
+          <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              {orderType === 'dine_in' ? (
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Mesa</label>
+                  <select
+                    value={selectedTableId || ''}
+                    onChange={e => onSelectTable(e.target.value ? Number(e.target.value) : null)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500"
+                  >
+                    <option value="">-- Elegir Mesa --</option>
+                    {tables.map(t => (
+                      <option key={t.id} value={t.id}>
+                        {t.name} ({t.status === 'occupied' ? 'Ocupada' : (t.status === 'billing' ? 'Por Pagar' : 'Libre')})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : orderType === 'delivery' ? (
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Plataforma / App</label>
+                  <select
+                    value={customerName || 'Didi'}
+                    onChange={e => setCustomerName(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500"
+                  >
+                    <option value="Didi">Didi</option>
+                    <option value="Rappi">Rappi</option>
+                    <option value="Uber">Uber</option>
+                  </select>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cliente</label>
+                  <input
+                    type="text"
+                    placeholder="Nombre del cliente..."
+                    value={customerName}
+                    onChange={e => setCustomerName(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+              )}
+
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Mesa</label>
-                <select
-                  value={selectedTableId || ''}
-                  onChange={e => onSelectTable(e.target.value ? Number(e.target.value) : null)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500"
-                >
-                  <option value="">-- Elegir Mesa --</option>
-                  {tables.map(t => (
-                    <option key={t.id} value={t.id}>
-                      {t.name} ({t.status === 'occupied' ? 'Ocupada' : (t.status === 'billing' ? 'Por Pagar' : 'Libre')})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : orderType === 'delivery' ? (
-              <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Plataforma / App</label>
-                <select
-                  value={customerName || 'Didi'}
-                  onChange={e => setCustomerName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500"
-                >
-                  <option value="Didi">Didi</option>
-                  <option value="Rappi">Rappi</option>
-                  <option value="Uber">Uber</option>
-                </select>
-              </div>
-            ) : (
-              <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cliente</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nota Orden</label>
                 <input
                   type="text"
-                  placeholder="Nombre..."
+                  placeholder="Ej. Sin prisa..."
+                  value={orderNotes}
+                  onChange={e => setOrderNotes(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500"
+                />
+              </div>
+            </div>
+
+            {orderType === 'dine_in' && (
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cliente (Opcional)</label>
+                <input
+                  type="text"
+                  placeholder="Nombre de cliente o comensal..."
                   value={customerName}
                   onChange={e => setCustomerName(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500"
                 />
               </div>
             )}
-
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nota Orden</label>
-              <input
-                type="text"
-                placeholder="Ej. Sin prisa..."
-                value={orderNotes}
-                onChange={e => setOrderNotes(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500"
-              />
-            </div>
           </div>
         </div>
 
