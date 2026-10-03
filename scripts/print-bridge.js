@@ -18,7 +18,7 @@ import { io } from 'socket.io-client';
 import net from 'net';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'https://punto-venta-production-a665.up.railway.app';
-const PRINTER_IP = process.env.PRINTER_IP || '192.168.1.67'; // Epson TM-T88VI en red local
+const PRINTER_IP = process.env.PRINTER_IP || '192.168.1.65'; // Epson TM-T88VI (confirmada en red)
 const PRINTER_PORT = Number(process.env.PRINTER_PORT) || 9100;
 
 console.log('====================================================');
