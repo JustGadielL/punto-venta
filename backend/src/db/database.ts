@@ -2,13 +2,17 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-// Ensure data directory exists
-const dataDir = path.resolve(process.cwd(), 'data');
+// Ensure data directory exists (Supports Railway Volume mount e.g. /app/data or /data)
+const dataDir = process.env.RAILWAY_VOLUME_MOUNT_PATH 
+  || process.env.DATA_DIR 
+  || path.resolve(process.cwd(), 'data');
+
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
 const dbPath = path.join(dataDir, 'pos_restaurant.db');
+console.log(`💾 Base de datos SQLite montada en: ${dbPath}`);
 export const db = new Database(dbPath);
 
 // Enable WAL mode and foreign keys for high concurrency & integrity

@@ -7,7 +7,12 @@ import {
   Store, 
   Lock, 
   KeyRound,
-  Zap
+  Zap,
+  Database,
+  Download,
+  Upload,
+  AlertTriangle,
+  HardDrive
 } from 'lucide-react';
 import { SystemSettings } from '../types';
 import { api } from '../services/api';
@@ -19,8 +24,11 @@ export const SettingsView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'hardware' | 'security'>('hardware');
+  const [activeTab, setActiveTab] = useState<'hardware' | 'security' | 'backup'>('hardware');
   const [autoPrint, setAutoPrint] = useState<boolean>(isAutoPrintEnabled());
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [restoreMessage, setRestoreMessage] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -52,6 +60,61 @@ export const SettingsView: React.FC = () => {
     }
   };
 
+  const handleDownloadBackup = async () => {
+    try {
+      setIsDownloading(true);
+      const data = await api.getBackup();
+      const dateStr = new Date().toISOString().split('T')[0];
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `respaldo_pos_${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      customAlert(err.message || 'Error al descargar la copia de seguridad');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!window.confirm('¿Deseas restaurar este respaldo? Se sobrescribirá el catálogo y datos con la información del archivo.')) {
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      setIsRestoring(true);
+      setRestoreMessage(null);
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const content = event.target?.result as string;
+          const backupData = JSON.parse(content);
+          const res = await api.restoreBackup(backupData);
+          setRestoreMessage(res.message || '¡Respaldo restaurado con éxito!');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } catch (parseErr: any) {
+          customAlert('El archivo seleccionado no es un formato JSON de respaldo válido.');
+          setIsRestoring(false);
+        }
+      };
+      reader.readAsText(file);
+    } catch (err: any) {
+      customAlert(err.message || 'Error al procesar el archivo');
+      setIsRestoring(false);
+    }
+  };
+
   const updateField = (key: string, value: string) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
@@ -71,7 +134,7 @@ export const SettingsView: React.FC = () => {
           <div>
             <h2 className="text-xl font-black text-white">Configuración del Sistema</h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Administra hardware de impresión y seguridad del POS
+              Administra hardware, seguridad y respaldos de base de datos
             </p>
           </div>
         </div>
@@ -84,7 +147,7 @@ export const SettingsView: React.FC = () => {
         )}
       </div>
 
-      <div className="flex bg-slate-900 p-2 rounded-2xl border border-slate-800 gap-2">
+      <div className="flex bg-slate-900 p-2 rounded-2xl border border-slate-800 gap-2 flex-wrap sm:flex-nowrap">
         <button
           onClick={() => setActiveTab('hardware')}
           className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors ${
@@ -106,6 +169,17 @@ export const SettingsView: React.FC = () => {
         >
           <Lock className="w-4 h-4" />
           Seguridad
+        </button>
+        <button
+          onClick={() => setActiveTab('backup')}
+          className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors ${
+            activeTab === 'backup' 
+              ? 'bg-slate-800 text-emerald-400 shadow-lg' 
+              : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+          }`}
+        >
+          <Database className="w-4 h-4" />
+          Base de Datos & Respaldos
         </button>
       </div>
 
@@ -272,17 +346,102 @@ export const SettingsView: React.FC = () => {
           </div>
         )}
 
+        {activeTab === 'backup' && (
+          <div className="flex flex-col gap-6 animate-fade-in">
+            {/* Info Banner on Railway Volume */}
+            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                <HardDrive className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  Persistencia en la Nube (Railway)
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    SQLite
+                  </span>
+                </h4>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Para que tu catálogo, productos y ventas <b>nunca se borren</b> al publicar cambios o hacer nuevos deploys en Railway, el backend ahora es compatible con <b>Railway Volumes</b>.
+                </p>
+                <div className="mt-2 text-xs bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-slate-300 font-mono">
+                  Ruta de montaje recomendada en Railway: <span className="text-amber-400 font-bold">/app/data</span>
+                </div>
+              </div>
+            </div>
+
+            {restoreMessage && (
+              <div className="p-4 bg-emerald-950/80 border border-emerald-700 text-emerald-300 rounded-2xl text-xs font-bold flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400" />
+                {restoreMessage} (Actualizando página...)
+              </div>
+            )}
+
+            {/* Backup Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Card 1: Descargar Copia */}
+              <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-4">
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3">
+                    <Download className="w-5 h-5" />
+                  </div>
+                  <h4 className="text-sm font-bold text-white">Descargar Copia de Seguridad</h4>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Descarga un archivo <code>.json</code> con todos tus productos, precios, fotos, categorías, modificadores, mesas y configuración.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDownloadBackup}
+                  disabled={isDownloading}
+                  className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-600/20 cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  {isDownloading ? 'Generando archivo...' : 'Descargar Respaldo JSON'}
+                </button>
+              </div>
+
+              {/* Card 2: Restaurar Copia */}
+              <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-4">
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-3">
+                    <Upload className="w-5 h-5" />
+                  </div>
+                  <h4 className="text-sm font-bold text-white">Restaurar Copia de Seguridad</h4>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Carga un archivo de respaldo descargado previamente para restaurar al 100% tu catálogo y datos de forma inmediata.
+                  </p>
+                </div>
+                <div>
+                  <label className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                    <Upload className="w-4 h-4" />
+                    {isRestoring ? 'Restaurando...' : 'Seleccionar Archivo JSON y Restaurar'}
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={handleFileUpload}
+                      disabled={isRestoring}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Submit Button */}
-        <div className="pt-4 border-t border-slate-800 flex justify-end">
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl text-xs font-black flex items-center gap-2 shadow-lg shadow-orange-600/30 transition-all hover:scale-105 active:scale-95"
-          >
-            <Save className="w-4 h-4" />
-            {isSaving ? 'Guardando...' : 'Guardar Configuración'}
-          </button>
-        </div>
+        {activeTab !== 'backup' && (
+          <div className="pt-4 border-t border-slate-800 flex justify-end">
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl text-xs font-black flex items-center gap-2 shadow-lg shadow-orange-600/30 transition-all hover:scale-105 active:scale-95"
+            >
+              <Save className="w-4 h-4" />
+              {isSaving ? 'Guardando...' : 'Guardar Configuración'}
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );

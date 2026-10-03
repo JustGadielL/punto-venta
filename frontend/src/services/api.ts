@@ -100,4 +100,6 @@ export const api = {
   getNetworkInfo: () => fetchJSON<NetworkInfo>('/system/network-info'),
   getSettings: () => fetchJSON<SystemSettings>('/system/settings'),
   updateSettings: (settings: SystemSettings) => fetchJSON<{ success: boolean; settings: SystemSettings }>('/system/settings', { method: 'PUT', body: JSON.stringify(settings) }),
+  getBackup: () => fetchJSON<any>('/system/backup'),
+  restoreBackup: (data: any) => fetchJSON<{ success: boolean; message: string }>('/system/restore', { method: 'POST', body: JSON.stringify(data) }),
 };
