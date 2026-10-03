@@ -225,8 +225,8 @@ function seedInitialData() {
   if (settingsCount.count === 0) {
     const insertSetting = db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)');
     const defaultSettings: Record<string, string> = {
-      restaurant_name: 'Taquería & Restaurante Los Amigos',
-      address: 'Av. Revolución #123, Col. Centro',
+      restaurant_name: "JJ's Restaurant",
+      address: 'Av. Ruiz Cortinez',
       phone: '(55) 1234-5678',
       tax_id: 'XAXX010101000',
       currency: '$',
@@ -348,6 +348,20 @@ function seedInitialData() {
       UPDATE cash_shifts
       SET initial_amount = 0.00
       WHERE initial_amount = 500.00 AND (notes = 'Turno inicial de apertura' OR total_sales = 0)
+    `).run();
+  } catch (e) {}
+
+  // Migration: Update default restaurant name and address if still on example values
+  try {
+    db.prepare(`
+      UPDATE settings 
+      SET value = "JJ's Restaurant" 
+      WHERE key = 'restaurant_name' AND (value LIKE '%Los Amigos%' OR value = 'MI RESTAURANTE' OR value = '')
+    `).run();
+    db.prepare(`
+      UPDATE settings 
+      SET value = 'Av. Ruiz Cortinez' 
+      WHERE key = 'address' AND (value LIKE '%Revolución%' OR value = '')
     `).run();
   } catch (e) {}
 

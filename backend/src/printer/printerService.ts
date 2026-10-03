@@ -60,8 +60,8 @@ export class PrinterService {
 
     const width = settings.paper_width === '58mm' ? 32 : 42;
     const currency = settings.currency || '$';
-    const restName = settings.restaurant_name || 'MI RESTAURANTE';
-    const address = settings.address || '';
+    const restName = settings.restaurant_name || "JJ's Restaurant";
+    const address = settings.address || 'Av. Ruiz Cortinez';
     const phone = settings.phone || '';
     const rfc = settings.tax_id || '';
     const footer = settings.ticket_footer || '¡Gracias por su compra!';
@@ -76,7 +76,9 @@ export class PrinterService {
 
     const dateStr = new Date(order.created_at.replace(' ', 'T') + 'Z').toLocaleString('es-MX', {
       dateStyle: 'short',
-      timeStyle: 'short'
+      timeStyle: 'short',
+      hour12: true,
+      timeZone: 'America/Mexico_City'
     });
 
     lines.push(this.formatLine(`TICKET #${order.order_number}`, dateStr, width));
@@ -306,7 +308,12 @@ export class PrinterService {
     settings: Record<string, string>
   ): { plainText: string; htmlContent: string; title: string } {
     const width = settings.paper_width === '58mm' ? 32 : 42;
-    const timeStr = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+    const timeStr = new Date().toLocaleTimeString('es-MX', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: true, 
+      timeZone: 'America/Mexico_City' 
+    });
     const dest = order.type === 'dine_in' 
       ? (order.table_name ? (order.table_name.toLowerCase().startsWith('mesa') ? order.table_name.toUpperCase() : `MESA: ${order.table_name.toUpperCase()}`) : (order.table_number ? `MESA: ${order.table_number}` : 'MESA S/N'))
       : (order.type === 'take_out' ? '*** ORDEN PARA LLEVAR ***' : '*** ORDEN POR APLICACIÓN (DELIVERY) ***');
@@ -564,18 +571,22 @@ export class PrinterService {
 
     const width = settings.paper_width === '58mm' ? 32 : 42;
     const currency = settings.currency || '$';
-    const restName = settings.restaurant_name || 'MI RESTAURANTE';
+    const restName = settings.restaurant_name || "JJ's Restaurant";
 
     const openedAtStr = new Date(shift.opened_at.replace(' ', 'T') + 'Z').toLocaleString('es-MX', {
       dateStyle: 'short',
-      timeStyle: 'short'
+      timeStyle: 'short',
+      hour12: true,
+      timeZone: 'America/Mexico_City'
     });
     
     let closedAtStr = 'EN CURSO';
     if (shift.closed_at) {
       closedAtStr = new Date(shift.closed_at.replace(' ', 'T') + 'Z').toLocaleString('es-MX', {
         dateStyle: 'short',
-        timeStyle: 'short'
+        timeStyle: 'short',
+        hour12: true,
+        timeZone: 'America/Mexico_City'
       });
     }
     const openDate = openedAtStr;

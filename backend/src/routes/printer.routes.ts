@@ -59,7 +59,7 @@ router.post('/printer/test', (req, res) => {
 ========================================
      *** PRUEBA DE IMPRESORA POS ***
 ========================================
-Fecha: ${new Date().toLocaleString('es-MX')}
+Fecha: ${new Date().toLocaleString('es-MX', { hour12: true, timeZone: 'America/Mexico_City' })}
 Estado: Sistema POS Conectado
 Modo: Virtual / ESC-POS Listo
 ----------------------------------------
@@ -70,7 +70,7 @@ Impresora térmica funcionando con éxito.
       <div style="font-family: monospace; max-width: 300px; padding: 16px; background: #f0fdf4; border: 2px dashed #22c55e; border-radius: 6px; text-align: center;">
         <h3 style="color: #15803d; margin: 0 0 6px 0;">✔ IMPRESIÓN DE PRUEBA</h3>
         <p style="font-size: 12px; margin: 0 0 8px 0; color: #166534;">La conexión con el módulo de impresión térmica está activa y operativa.</p>
-        <div style="font-size: 10px; color: #64748b;">${new Date().toLocaleString('es-MX')}</div>
+        <div style="font-size: 10px; color: #64748b;">${new Date().toLocaleString('es-MX', { hour12: true, timeZone: 'America/Mexico_City' })}</div>
       </div>
     `;
 

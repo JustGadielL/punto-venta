@@ -19,6 +19,9 @@ import modifiersRoutes from './routes/modifiers.routes.js';
 
 dotenv.config();
 
+// Ensure all Date instances and timezone calculations use Mexican Central Time (America/Mexico_City)
+process.env.TZ = process.env.TIMEZONE || 'America/Mexico_City';
+
 // Prevent server crash from unhandled promise rejections (e.g. from printer timeouts)
 process.on('uncaughtException', (err) => {
   console.error('⚠️ Uncaught Exception:', err);
