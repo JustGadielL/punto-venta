@@ -387,7 +387,7 @@ export class PrinterService {
                 const clean = (it.notes || '').replace(/\[PARA LLEVAR\]/g, '').trim();
                 return clean ? `
                   <div style="border-left: 3px solid #000; padding: 3px 6px; margin-top: 3px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
-                    ⚠️ NOTA: ${clean}
+                    NOTA: ${clean}
                   </div>
                 ` : '';
               })()}
@@ -480,7 +480,7 @@ export class PrinterService {
         <div style="display: flex; flex-direction: column; gap: 20px;">
           ${kitchenTicket.htmlContent}
           <div style="border-top: 2px dashed #94a3b8; margin: 4px 0; text-align: center; color: #94a3b8; font-size: 11px; font-weight: bold; letter-spacing: 1px;">
-            ✂️ CORTE DE TICKET (BARRA / BEBIDAS) ✂️
+            --- CORTE DE TICKET (BARRA / BEBIDAS) ---
           </div>
           ${barTicket.htmlContent}
         </div>

@@ -130,9 +130,9 @@ export const PrinterView: React.FC<PrinterViewProps> = ({ onShowTicket }) => {
             {tickets.map(t => {
               const isSelected = selectedTicket?.id === t.id;
               const typeIcon = t.type === 'kitchen_comanda' 
-                ? <ChefHat className="w-4 h-4 text-amber-400" />
+                ? <FileText className="w-4 h-4 text-amber-400" />
                 : (t.type === 'bar_comanda' 
-                    ? <Wine className="w-4 h-4 text-purple-400" />
+                    ? <FileText className="w-4 h-4 text-purple-400" />
                     : (t.type === 'cash_shift' ? <Receipt className="w-4 h-4 text-blue-400" /> : <FileText className="w-4 h-4 text-emerald-400" />));
 
               return (

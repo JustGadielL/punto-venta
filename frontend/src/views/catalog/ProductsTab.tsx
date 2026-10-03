@@ -260,7 +260,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ products, categories, 
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <span className="text-base">🍳</span>
+                  <span className="text-base"></span>
                   <span>Cocina (Comida)</span>
                 </button>
                 <button
@@ -272,7 +272,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({ products, categories, 
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <span className="text-base">🍹</span>
+                  <span className="text-base"></span>
                   <span>Barra (Bebidas)</span>
                 </button>
               </div>

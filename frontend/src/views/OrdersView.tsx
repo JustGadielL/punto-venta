@@ -130,7 +130,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ onSelectTableForPos, onS
         {loading && orders.length === 0 ? (
           <div className="text-center py-10 text-slate-400">Cargando...</div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 pb-28">
             {filteredOrders.length === 0 ? (
               <div className="text-center py-10 text-slate-500 font-bold">No hay pedidos en esta sección</div>
             ) : (

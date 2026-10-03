@@ -327,9 +327,9 @@ export const PosView: React.FC<PosViewProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-2 md:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 h-full min-h-0">
-      {/* LEFT COLUMN: Categories & Product Grid (7 cols on lg, 8 on xl) */}
-      <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-3 h-full min-h-0 overflow-hidden">
+    <div className="max-w-7xl mx-auto p-2 md:p-4 grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 h-full min-h-0">
+      {/* LEFT COLUMN: Categories & Product Grid (7 cols on md/lg, 8 on xl) */}
+      <div className="md:col-span-7 lg:col-span-7 xl:col-span-8 flex flex-col gap-3 h-full min-h-0 overflow-hidden">
         {/* Search Bar */}
         <div className="bg-slate-900/90 border border-slate-800 p-3 rounded-2xl shadow-lg relative z-20">
           <div className="relative w-full">
@@ -490,7 +490,7 @@ export const PosView: React.FC<PosViewProps> = ({
       </div>
 
       {/* RIGHT COLUMN: Interactive Cart & Checkout Panel */}
-      <div className="lg:col-span-5 xl:col-span-4 bg-slate-900 border border-slate-800 rounded-3xl p-4 flex flex-col h-full min-h-0 shadow-2xl overflow-hidden">
+      <div className="md:col-span-5 lg:col-span-5 xl:col-span-4 bg-slate-900 border border-slate-800 rounded-3xl p-4 flex flex-col h-full min-h-0 shadow-2xl overflow-hidden">
         {/* Order Header / Destination */}
         <div className="border-b border-slate-800 pb-3 mb-3 shrink-0">
           <div className="flex items-center justify-between gap-2 mb-2.5">
@@ -760,7 +760,7 @@ export const PosView: React.FC<PosViewProps> = ({
                   : 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20 active:scale-95'
               }`}
             >
-              <ChefHat className="w-5 h-5" />
+              <FileText className="w-5 h-5" />
               <span>{isSendingKitchen ? 'Enviando...' : 'Mandar a Comanda'}</span>
             </button>
           </div>

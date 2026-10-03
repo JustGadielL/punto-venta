@@ -1,18 +1,41 @@
-import React from 'react';
-import { Settings, BookOpen, Receipt, Smartphone, ChevronRight, BarChart3 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Settings, BookOpen, Receipt, Smartphone, ChevronRight, BarChart3, Copy, Check, ExternalLink } from 'lucide-react';
 import { CatalogView } from './CatalogView';
 import { CashView } from './CashView';
 import { SettingsView } from './SettingsView';
 import { ReportsView } from './ReportsView';
 import { CashShift, Category, Product, PrintedTicket } from '../types';
-import { api } from '../services/api';
 
 const QrCodeDisplay = () => {
-  const [qr, setQr] = React.useState('');
-  React.useEffect(() => {
-    api.getNetworkInfo().then(info => setQr(info.qrCodeDataUrl)).catch(() => {});
-  }, []);
-  return qr ? <img src={qr} alt="QR Code" className="w-64 h-64" /> : <div>Cargando...</div>;
+  const [copied, setCopied] = useState(false);
+  const appUrl = typeof window !== 'undefined' ? window.location.origin : 'https://punto-venta-red.vercel.app';
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=${encodeURIComponent(appUrl)}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(appUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="bg-white p-3 rounded-2xl shadow-xl border border-slate-700">
+        <img src={qrUrl} alt="QR Acceso POS" className="w-56 h-56 rounded-lg" />
+      </div>
+      
+      <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 max-w-sm">
+        <span className="text-xs text-orange-400 font-mono font-bold truncate">{appUrl}</span>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="p-1 text-slate-400 hover:text-white transition-colors"
+          title="Copiar URL"
+        >
+          {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+        </button>
+      </div>
+    </div>
+  );
 };
 
 interface MoreMenuProps {
@@ -49,12 +72,15 @@ export const MoreMenu: React.FC<MoreMenuProps> = ({
         return <SettingsView />;
       case 'devices':
         return (
-          <div className="p-8 h-full flex flex-col items-center justify-center bg-slate-900">
-            <h2 className="text-2xl font-bold mb-4">Vincular Dispositivo (Tablet)</h2>
-            <p className="text-slate-400 mb-8 max-w-md text-center">Para usar el sistema en una Tablet, conéctala a la misma red WiFi y escanea este código QR.</p>
-            <div className="bg-white p-4 rounded-xl">
-              <QrCodeDisplay />
-            </div>
+          <div className="p-6 md:p-8 h-full flex flex-col items-center justify-center bg-slate-900 overflow-y-auto pb-24">
+            <h2 className="text-2xl font-bold mb-2 text-white">Vincular Dispositivo (Tablet o Celular)</h2>
+            <p className="text-slate-400 mb-6 max-w-md text-center text-sm">
+              Escanea este código QR con la cámara de cualquier tableta o teléfono para acceder directamente al Punto de Venta.
+            </p>
+            <QrCodeDisplay />
+            <p className="text-slate-500 text-xs mt-6 text-center max-w-sm">
+              Tip: En el navegador de tu tableta toca <b>"Agregar a la pantalla principal"</b> para usar el sistema a pantalla completa como una App nativa.
+            </p>
           </div>
         );
       default:

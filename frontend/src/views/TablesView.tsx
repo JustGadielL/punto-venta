@@ -109,7 +109,7 @@ export const TablesView: React.FC<TablesViewProps> = ({
   // };
 
   return (
-    <div className="max-w-7xl mx-auto p-3 md:p-6 flex flex-col gap-5">
+    <div className="max-w-7xl mx-auto p-3 md:p-6 flex flex-col gap-5 h-full overflow-y-auto pb-28">
       {/* Header & Status Filter Bar */}
       <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-xl">
         <div>
