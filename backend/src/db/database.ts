@@ -311,10 +311,19 @@ function seedInitialData() {
   const tableCount = db.prepare('SELECT COUNT(*) as count FROM tables').get() as { count: number };
   if (tableCount.count === 0) {
     const insertTable = db.prepare('INSERT INTO tables (number, name, capacity, status) VALUES (?, ?, ?, ?)');
+    const standardTables = [
+      [1, 'Afuera 1', 4, 'available'],
+      [2, 'Afuera 2', 4, 'available'],
+      [3, 'Mesa 1', 4, 'available'],
+      [4, 'Mesa 2', 4, 'available'],
+      [5, 'Mesa 3', 4, 'available'],
+      [6, 'Mesa 4', 4, 'available'],
+      [7, 'Mesa 5', 4, 'available'],
+      [8, 'Mesa 6', 4, 'available'],
+    ];
     const seedTables = db.transaction(() => {
-      for (let i = 1; i <= 10; i++) {
-        const capacity = i <= 4 ? 2 : (i <= 8 ? 4 : 6);
-        insertTable.run(i, `Mesa ${i}`, capacity, 'available');
+      for (const t of standardTables) {
+        insertTable.run(t[0], t[1], t[2], t[3]);
       }
     });
     seedTables();
