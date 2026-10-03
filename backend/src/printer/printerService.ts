@@ -152,29 +152,29 @@ export class PrinterService {
 
     // 2. HTML Representation for modern visual preview in app
     const htmlContent = `
-      <div class="ticket-receipt" style="font-family: 'Courier New', Courier, monospace; width: 100%; max-width: 340px; margin: 0 auto; padding: 16px; background: #fff; color: #111; border: 1px dashed #ccc; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-radius: 4px; font-size: 13px; line-height: 1.4;">
-        <div style="text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 4px;">${restName}</div>
-        ${address ? `<div style="text-align: center; font-size: 11px; color: #555;">${address}</div>` : ''}
-        ${phone ? `<div style="text-align: center; font-size: 11px; color: #555;">Tel: ${phone}</div>` : ''}
-        ${rfc ? `<div style="text-align: center; font-size: 11px; color: #555;">RFC: ${rfc}</div>` : ''}
-        <div style="border-top: 2px dashed #333; margin: 8px 0;"></div>
+      <div class="ticket-receipt" style="font-family: 'Courier New', Courier, monospace; width: 100%; max-width: 360px; margin: 0 auto; padding: 10px 4px; background: #fff; color: #111; font-size: 15px; line-height: 1.35;">
+        <div style="text-align: center; font-weight: 900; font-size: 18px; margin-bottom: 4px;">${restName}</div>
+        ${address ? `<div style="text-align: center; font-size: 12px; color: #333;">${address}</div>` : ''}
+        ${phone ? `<div style="text-align: center; font-size: 12px; color: #333;">Tel: ${phone}</div>` : ''}
+        ${rfc ? `<div style="text-align: center; font-size: 12px; color: #333;">RFC: ${rfc}</div>` : ''}
+        <div style="border-top: 2px dashed #000; margin: 8px 0;"></div>
         
-        <div style="display: flex; justify-content: space-between; font-weight: bold;">
+        <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 16px;">
           <span>TICKET #${order.order_number}</span>
           <span>${dateStr}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 2px;">
+        <div style="display: flex; justify-content: space-between; font-size: 14px; margin-top: 3px; font-weight: bold;">
           <span>${dest}</span>
           <span>Folio: ${order.id}</span>
         </div>
-        ${order.customer_name ? `<div style="font-size: 12px; margin-top: 2px;">Cliente: <b>${order.customer_name}</b></div>` : ''}
+        ${order.customer_name ? `<div style="font-size: 14px; margin-top: 3px;">Cliente: <b>${order.customer_name}</b></div>` : ''}
         
-        <div style="border-top: 1px dashed #888; margin: 8px 0;"></div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; text-transform: uppercase;">
+        <div style="border-top: 2px dashed #000; margin: 8px 0;"></div>
+        <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 13px; text-transform: uppercase;">
           <span>Cant. / Producto</span>
           <span>Importe</span>
         </div>
-        <div style="border-top: 1px dashed #888; margin: 4px 0 8px 0;"></div>
+        <div style="border-top: 1px dashed #000; margin: 4px 0 8px 0;"></div>
 
         <div style="display: flex; flex-direction: column; gap: 6px;">
           ${items.map(it => `
@@ -347,27 +347,27 @@ export class PrinterService {
     const plainText = lines.join('\n');
 
     const htmlContent = `
-      <div class="ticket-comanda" style="font-family: 'Courier New', Courier, monospace; width: 100%; max-width: 340px; margin: 0 auto; padding: 16px; background: #fff; color: #000; border: 2px dashed #000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-radius: 4px; font-size: 13px; line-height: 1.4; page-break-after: always; break-after: page;">
-        <div style="background: ${headerBg}; color: #fff; text-align: center; font-weight: bold; font-size: 15px; padding: 6px 4px; border-radius: 3px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+      <div class="ticket-comanda" style="font-family: 'Courier New', Courier, monospace; width: 100%; max-width: 360px; margin: 0 auto; padding: 8px 4px; background: #fff; color: #000; font-size: 15px; line-height: 1.35; page-break-after: always; break-after: page;">
+        <div style="background: ${headerBg}; color: #fff; text-align: center; font-weight: 900; font-size: 18px; padding: 8px 4px; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
           ${areaTitle}
         </div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 15px;">
+        <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 17px;">
           <span>ORDEN #${order.order_number}</span>
           <span>${timeStr}</span>
         </div>
-        <div style="border: 2px solid #000; padding: 6px; margin: 6px 0; border-radius: 4px; font-weight: bold; font-size: 14px; text-align: center; text-transform: uppercase;">
+        <div style="border: 2px solid #000; padding: 8px; margin: 8px 0; border-radius: 6px; font-weight: 900; font-size: 18px; text-align: center; text-transform: uppercase;">
           ${dest}
         </div>
-        ${order.customer_name ? `<div style="font-size: 12px; margin-bottom: 4px;">Cliente: <b>${order.customer_name}</b></div>` : ''}
+        ${order.customer_name ? `<div style="font-size: 14px; margin-bottom: 4px; font-weight: bold;">Cliente: <b>${order.customer_name}</b></div>` : ''}
         
         <div style="border-top: 2px dashed #000; margin: 8px 0;"></div>
 
         <div style="display: flex; flex-direction: column; gap: 8px;">
           ${items.map(it => `
-            <div style="border-bottom: 1px dotted #ccc; padding-bottom: 6px;">
-              <div style="font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: space-between;">
+            <div style="border-bottom: 1px dashed #000; padding-bottom: 6px;">
+              <div style="font-size: 17px; font-weight: 900; display: flex; align-items: center; justify-content: space-between;">
                 <div>
-                  <span style="background: #000; color: #fff; padding: 1px 6px; border-radius: 3px; margin-right: 4px;">${it.quantity}x</span>
+                  <span style="background: #000; color: #fff; padding: 2px 8px; border-radius: 4px; margin-right: 6px; font-weight: 900;">${it.quantity}x</span>
                   ${it.product_name}
                 </div>
                 ${it.notes && it.notes.includes('[PARA LLEVAR]') ? `

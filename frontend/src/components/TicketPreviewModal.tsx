@@ -31,10 +31,57 @@ export const TicketPreviewModal: React.FC<TicketPreviewModalProps> = ({ ticket, 
           <head>
             <title>${ticket.title || 'Ticket'}</title>
             <style>
-              body { margin: 0; padding: 10px; font-family: 'Courier New', Courier, monospace; }
+              * {
+                box-sizing: border-box;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              @page {
+                size: 80mm auto;
+                margin: 0;
+              }
+              html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 80mm !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 15px !important;
+                line-height: 1.35 !important;
+              }
+              .ticket-comanda, .ticket-receipt, div[style*="max-width: 340px"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 4px 6px !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+              }
+              /* Boost font sizes for 80mm thermal roll */
+              div[style*="font-size: 15px"], div[style*="font-size: 14px"] {
+                font-size: 17px !important;
+                font-weight: 900 !important;
+              }
+              div[style*="font-size: 13px"], div[style*="font-size: 12px"] {
+                font-size: 15px !important;
+              }
+              div[style*="font-size: 11px"], div[style*="font-size: 10px"] {
+                font-size: 13px !important;
+              }
               @media print {
-                @page { margin: 0; }
-                body { margin: 0; }
+                @page {
+                  size: 80mm auto;
+                  margin: 0;
+                }
+                body {
+                  width: 80mm !important;
+                  max-width: 80mm !important;
+                  margin: 0 !important;
+                  padding: 0 !important;
+                }
               }
             </style>
           </head>
