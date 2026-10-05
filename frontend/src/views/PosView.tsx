@@ -15,7 +15,8 @@ import {
   X,
   Check,
   ArrowLeft,
-  Store
+  Store,
+  Save
 } from 'lucide-react';
 import { Category, Product, Table, OrderItem, Order, CashShift } from '../types';
 import { api } from '../services/api';
@@ -60,6 +61,7 @@ export const PosView: React.FC<PosViewProps> = ({
   const [cartItems, setCartItems] = useState<OrderItem[]>([]);
   const [currentOrderId, setCurrentOrderId] = useState<number | null>(null);
   const [isSendingKitchen, setIsSendingKitchen] = useState<boolean>(false);
+  const [isSavingOnly, setIsSavingOnly] = useState<boolean>(false);
   const [itemNoteModal, setItemNoteModal] = useState<{ index: number; note: string } | null>(null);
   
   // Modifiers Modal State
@@ -244,6 +246,51 @@ export const PosView: React.FC<PosViewProps> = ({
   // Cart totals
   const subtotal = cartItems.reduce((sum, it) => sum + (it.unit_price * it.quantity), 0);
   const total = subtotal;
+
+  // Save Order Only (No Comanda Print)
+  const handleSaveOnly = async () => {
+    if (cartItems.length === 0) return;
+    if (orderType === 'dine_in' && !selectedTableId) {
+      customAlert('Por favor selecciona una mesa para la orden en comedor.');
+      return;
+    }
+
+    setIsSavingOnly(true);
+    try {
+      let orderId = currentOrderId;
+      const finalCustomerName = orderType === 'delivery' ? (customerName || 'Didi') : customerName;
+
+      if (!orderId) {
+        // Create new order
+        const newOrder = await api.createOrder({
+          table_id: orderType === 'dine_in' ? selectedTableId : null,
+          type: orderType,
+          customer_name: finalCustomerName,
+          notes: orderNotes,
+          items: cartItems
+        });
+        orderId = newOrder.id;
+        setCurrentOrderId(orderId);
+        if (newOrder.items) setCartItems(newOrder.items);
+      } else {
+        // Update existing order items
+        const updated = await api.updateOrderItems(orderId, {
+          items: cartItems,
+          customer_name: finalCustomerName,
+          notes: orderNotes,
+          type: orderType,
+          table_id: orderType === 'dine_in' ? selectedTableId : null
+        });
+        if (updated.items) setCartItems(updated.items);
+      }
+
+      customAlert('Pedido guardado correctamente sin imprimir comanda.');
+    } catch (err: any) {
+      customAlert(err.message || 'Error al guardar el pedido');
+    } finally {
+      setIsSavingOnly(false);
+    }
+  };
 
   // Send Comanda to Kitchen / Save Order
   const handleSendToKitchen = async () => {
@@ -750,19 +797,52 @@ export const PosView: React.FC<PosViewProps> = ({
 
           {/* Action Grid */}
           <div className="grid grid-cols-2 gap-2">
+            {/* Solo Guardar (Sin Imprimir) */}
+            <button
+              type="button"
+              disabled={cartItems.length === 0 || isSavingOnly || isSendingKitchen}
+              onClick={handleSaveOnly}
+              className={`py-3 px-1 rounded-2xl font-bold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-lg ${
+                cartItems.length === 0 || isSavingOnly || isSendingKitchen
+                  ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20 active:scale-95'
+              }`}
+              title="Guardar comanda sin imprimir ticket"
+            >
+              <Save className="w-4 h-4" />
+              <span>{isSavingOnly ? 'Guardando...' : 'Solo Guardar'}</span>
+            </button>
+
             {/* Imprimir Cuenta Button */}
             <button
               type="button"
               disabled={!currentOrderId}
               onClick={handleRequestBill}
-              className={`py-3 px-1 rounded-2xl font-bold text-[11px] md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-lg ${
+              className={`py-3 px-1 rounded-2xl font-bold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-lg ${
                 !currentOrderId
                   ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
                   : 'bg-slate-700 hover:bg-slate-600 text-white shadow-slate-900/20 active:scale-95'
               }`}
+              title="Imprimir ticket de cuenta para el cliente"
             >
               <FileText className="w-4 h-4" />
-              <span>Imprimir</span>
+              <span>Cuenta</span>
+            </button>
+
+            {/* Kitchen Comanda Button */}
+            <button
+              type="button"
+              disabled={cartItems.length === 0 || isSendingKitchen || isSavingOnly}
+              onClick={handleSendToKitchen}
+              className={`py-3 px-1 rounded-2xl font-black text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-lg ${
+                cartItems.length === 0 || isSendingKitchen || isSavingOnly
+                  ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                  : 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20 active:scale-95'
+              }`}
+              title="Guardar e imprimir comanda en cocina/barra"
+            >
+              <ChefHat className="w-4 h-4" />
+              <span>{isSendingKitchen ? 'Enviando...' : 'Comanda'}</span>
             </button>
 
             {/* Direct Pay / Checkout Button */}
@@ -770,7 +850,7 @@ export const PosView: React.FC<PosViewProps> = ({
               type="button"
               disabled={cartItems.length === 0}
               onClick={handleProceedCheckout}
-              className={`py-3 px-1 rounded-2xl font-black text-[11px] md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-lg ${
+              className={`py-3 px-1 rounded-2xl font-black text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-lg ${
                 cartItems.length === 0
                   ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
                   : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 hover:scale-[1.02] active:scale-95'
@@ -778,21 +858,6 @@ export const PosView: React.FC<PosViewProps> = ({
             >
               <CreditCard className="w-4 h-4" />
               <span>Cobrar</span>
-            </button>
-
-            {/* Kitchen Comanda Button */}
-            <button
-              type="button"
-              disabled={cartItems.length === 0 || isSendingKitchen}
-              onClick={handleSendToKitchen}
-              className={`col-span-2 py-4 px-2 rounded-2xl font-black text-sm md:text-base flex items-center justify-center gap-2 transition-all shadow-lg ${
-                cartItems.length === 0 || isSendingKitchen
-                  ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
-                  : 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/20 active:scale-95'
-              }`}
-            >
-              <FileText className="w-5 h-5" />
-              <span>{isSendingKitchen ? 'Enviando...' : 'Mandar a Comanda'}</span>
             </button>
           </div>
         </div>
