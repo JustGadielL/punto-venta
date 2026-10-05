@@ -573,7 +573,7 @@ export const PosView: React.FC<PosViewProps> = ({
                 onClick={() => {
                   setOrderType('take_out');
                   onSelectTable(null);
-                  if (['Didi', 'Rappi', 'Uber'].includes(customerName)) {
+                  if (['Didi', 'Rappi', 'Uber', 'Recolección'].includes(customerName)) {
                     setCustomerName('');
                   }
                 }}
@@ -586,8 +586,8 @@ export const PosView: React.FC<PosViewProps> = ({
                 onClick={() => {
                   setOrderType('pickup');
                   onSelectTable(null);
-                  if (['Didi', 'Rappi', 'Uber'].includes(customerName)) {
-                    setCustomerName('');
+                  if (!customerName || ['Didi', 'Rappi', 'Uber'].includes(customerName)) {
+                    setCustomerName('Recolección');
                   }
                 }}
                 className={`flex-1 py-1.5 rounded-lg transition-colors ${orderType === 'pickup' ? 'bg-orange-600 text-white' : 'text-slate-400 hover:text-white'}`}
@@ -658,11 +658,11 @@ export const PosView: React.FC<PosViewProps> = ({
               ) : (
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    {orderType === 'pickup' ? 'Cliente / WhatsApp' : 'Cliente'}
+                    {orderType === 'pickup' ? 'Cliente / Recolección' : 'Cliente'}
                   </label>
                   <input
                     type="text"
-                    placeholder={orderType === 'pickup' ? 'Nombre o WhatsApp...' : 'Nombre del cliente...'}
+                    placeholder={orderType === 'pickup' ? 'Recolección (o nombre / tel)...' : 'Nombre del cliente...'}
                     value={customerName}
                     onChange={e => setCustomerName(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500"
