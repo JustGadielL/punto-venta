@@ -183,7 +183,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ onShowTicket
                           </span>
                         ) : (
                           <span className="px-1.5 py-0.5 bg-slate-800 text-amber-300 rounded font-bold text-[10px]">
-                            {order.type === 'take_out' ? 'Para llevar' : (order.type === 'delivery' ? 'App' : 'Mostrador')}
+                            {order.type === 'take_out' ? 'Para llevar' : (order.type === 'pickup' ? 'Recoger' : (order.type === 'delivery' ? 'App' : 'Mostrador'))}
                           </span>
                         )}
                         {order.customer_name && <span>• {order.customer_name}</span>}
@@ -247,7 +247,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ onShowTicket
                         <span className="text-sky-400 font-bold">{selectedOrder.table_name}</span>
                       ) : (
                         <span className="text-amber-400 font-bold">
-                          {selectedOrder.type === 'take_out' ? 'Para Llevar' : (selectedOrder.type === 'delivery' ? 'App' : 'Mostrador')}
+                          {selectedOrder.type === 'take_out' ? 'Para Llevar' : (selectedOrder.type === 'pickup' ? 'Recoger' : (selectedOrder.type === 'delivery' ? 'App' : 'Mostrador'))}
                         </span>
                       )}
                       {selectedOrder.customer_name && <span className="text-slate-400 font-normal"> • {selectedOrder.customer_name}</span>}

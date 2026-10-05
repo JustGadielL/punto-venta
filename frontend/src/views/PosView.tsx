@@ -53,7 +53,7 @@ export const PosView: React.FC<PosViewProps> = ({
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<number | 'all' | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [orderType, setOrderType] = useState<'dine_in' | 'take_out' | 'delivery'>(selectedTableId ? 'dine_in' : 'dine_in');
+  const [orderType, setOrderType] = useState<'dine_in' | 'take_out' | 'delivery' | 'pickup'>(selectedTableId ? 'dine_in' : 'dine_in');
   const [customerName, setCustomerName] = useState<string>('');
   const [orderNotes, setOrderNotes] = useState<string>('');
   
@@ -284,7 +284,7 @@ export const PosView: React.FC<PosViewProps> = ({
         if (updated.items) setCartItems(updated.items);
       }
 
-      customAlert('Pedido guardado correctamente sin imprimir comanda.');
+      customAlert('Pedido guardado correctamente.');
     } catch (err: any) {
       customAlert(err.message || 'Error al guardar el pedido');
     } finally {
@@ -555,7 +555,7 @@ export const PosView: React.FC<PosViewProps> = ({
         {/* Order Header / Destination */}
         <div className="border-b border-slate-800 pb-3 mb-3 shrink-0">
           <div className="flex items-center justify-between gap-2 mb-2.5">
-            <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold w-full">
+            <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] md:text-xs font-bold w-full">
               <button
                 type="button"
                 onClick={() => {
@@ -580,6 +580,19 @@ export const PosView: React.FC<PosViewProps> = ({
                 className={`flex-1 py-1.5 rounded-lg transition-colors ${orderType === 'take_out' ? 'bg-orange-600 text-white' : 'text-slate-400 hover:text-white'}`}
               >
                 Llevar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOrderType('pickup');
+                  onSelectTable(null);
+                  if (['Didi', 'Rappi', 'Uber'].includes(customerName)) {
+                    setCustomerName('');
+                  }
+                }}
+                className={`flex-1 py-1.5 rounded-lg transition-colors ${orderType === 'pickup' ? 'bg-orange-600 text-white' : 'text-slate-400 hover:text-white'}`}
+              >
+                Recoger
               </button>
               <button
                 type="button"
@@ -644,10 +657,12 @@ export const PosView: React.FC<PosViewProps> = ({
                 </div>
               ) : (
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cliente</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                    {orderType === 'pickup' ? 'Cliente / WhatsApp' : 'Cliente'}
+                  </label>
                   <input
                     type="text"
-                    placeholder="Nombre del cliente..."
+                    placeholder={orderType === 'pickup' ? 'Nombre o WhatsApp...' : 'Nombre del cliente...'}
                     value={customerName}
                     onChange={e => setCustomerName(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500"
@@ -797,7 +812,7 @@ export const PosView: React.FC<PosViewProps> = ({
 
           {/* Action Grid */}
           <div className="grid grid-cols-2 gap-2">
-            {/* Solo Guardar (Sin Imprimir) */}
+            {/* Guardar (Sin Imprimir) */}
             <button
               type="button"
               disabled={cartItems.length === 0 || isSavingOnly || isSendingKitchen}
@@ -810,7 +825,7 @@ export const PosView: React.FC<PosViewProps> = ({
               title="Guardar comanda sin imprimir ticket"
             >
               <Save className="w-4 h-4" />
-              <span>{isSavingOnly ? 'Guardando...' : 'Solo Guardar'}</span>
+              <span>{isSavingOnly ? 'Guardando...' : 'Guardar'}</span>
             </button>
 
             {/* Imprimir Cuenta Button */}

@@ -111,7 +111,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ order, onClose, on
           <div>
             <span className="text-xs uppercase tracking-wider font-bold text-orange-400">Procesar Cobro</span>
             <h2 className="text-xl font-black text-white">
-              Orden #{order.order_number} {order.table_name ? `• ${order.table_name}` : (order.type === 'take_out' ? '• Para Llevar' : '')}
+              Orden #{order.order_number} {order.table_name ? `• ${order.table_name}` : (order.type === 'take_out' ? '• Para Llevar' : (order.type === 'pickup' ? '• Recoger' : ''))}
             </h2>
           </div>
           <button 

@@ -79,7 +79,7 @@ export interface Order {
   table_id: number | null;
   table_name?: string;
   table_number?: number;
-  type: 'dine_in' | 'take_out' | 'delivery';
+  type: 'dine_in' | 'take_out' | 'delivery' | 'pickup';
   customer_name: string;
   status: 'pending' | 'in_preparation' | 'ready' | 'paid' | 'cancelled' | 'refunded';
   shift_id: number | null;

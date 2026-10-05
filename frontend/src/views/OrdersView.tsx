@@ -69,6 +69,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ onSelectTableForPos, onS
   const getTypeIcon = (type: string) => {
     if (type === 'dine_in') return <Utensils className="w-4 h-4 text-sky-400" />;
     if (type === 'take_out' || type === 'takeaway') return <Store className="w-4 h-4 text-amber-400" />;
+    if (type === 'pickup') return <ShoppingBag className="w-4 h-4 text-emerald-400" />;
     if (type === 'delivery') return <Bike className="w-4 h-4 text-purple-400" />;
     return <Utensils className="w-4 h-4 text-slate-400" />;
   };
@@ -76,13 +77,15 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ onSelectTableForPos, onS
   const getTypeName = (type: string) => {
     if (type === 'dine_in') return 'Comedor';
     if (type === 'take_out' || type === 'takeaway') return 'Para llevar';
+    if (type === 'pickup') return 'Recoger';
     if (type === 'delivery') return 'App';
     return type;
   };
 
   const getTypeLabel = (type: string) => {
     if (type === 'dine_in') return 'Comedor';
-    if (type === 'takeaway') return 'Para Llevar';
+    if (type === 'take_out' || type === 'takeaway') return 'Para Llevar';
+    if (type === 'pickup') return 'Recoger';
     if (type === 'delivery') return 'Aplicación';
     return type;
   };

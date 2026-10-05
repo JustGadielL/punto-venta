@@ -84,14 +84,14 @@ export class PrinterService {
     lines.push(this.formatLine(`TICKET #${order.order_number}`, dateStr, width));
     const dest = order.type === 'dine_in' 
       ? (order.table_name ? (order.table_name.toLowerCase().startsWith('mesa') ? order.table_name.toUpperCase() : `MESA: ${order.table_name.toUpperCase()}`) : (order.table_number ? `MESA: ${order.table_number}` : 'MESA S/N'))
-      : (order.type === 'take_out' ? 'PARA LLEVAR' : 'APP');
+      : (order.type === 'take_out' ? 'PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN' : 'APP'));
     lines.push(this.formatLine(`TIPO: ${dest}`, `ORDEN #${order.id}`, width));
 
     const clientDisplayName = (order.customer_name && order.customer_name.trim().length > 0)
       ? order.customer_name.trim().toUpperCase()
       : (order.type === 'dine_in'
           ? (order.table_name ? order.table_name.toUpperCase() : `MESA ${order.table_number || 'S/N'}`)
-          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : 'DELIVERY / APP'));
+          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN / WHATSAPP' : 'DELIVERY / APP')));
     lines.push(this.formatDivider('=', width));
     lines.push(this.formatCenter(`CLIENTE: ${clientDisplayName}`, width));
     lines.push(this.formatDivider('=', width));
@@ -316,7 +316,7 @@ export class PrinterService {
     });
     const dest = order.type === 'dine_in' 
       ? (order.table_name ? (order.table_name.toLowerCase().startsWith('mesa') ? order.table_name.toUpperCase() : `MESA: ${order.table_name.toUpperCase()}`) : (order.table_number ? `MESA: ${order.table_number}` : 'MESA S/N'))
-      : (order.type === 'take_out' ? '*** ORDEN PARA LLEVAR ***' : '*** ORDEN POR APLICACIÓN (DELIVERY) ***');
+      : (order.type === 'take_out' ? '*** ORDEN PARA LLEVAR ***' : (order.type === 'pickup' ? '*** RECOLECCIÓN (PASAR A TRAER) ***' : '*** ORDEN POR APLICACIÓN (DELIVERY) ***'));
 
     const isKitchen = area === 'COCINA';
     const areaTitle = isKitchen ? 'COCINA' : 'BARRA';
@@ -327,7 +327,7 @@ export class PrinterService {
       ? order.customer_name.trim().toUpperCase()
       : (order.type === 'dine_in'
           ? (order.table_name ? order.table_name.toUpperCase() : `MESA ${order.table_number || 'S/N'}`)
-          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : 'DELIVERY / APP'));
+          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN / WHATSAPP' : 'DELIVERY / APP')));
 
     const lines: string[] = [];
     lines.push(this.formatDivider('=', width));
