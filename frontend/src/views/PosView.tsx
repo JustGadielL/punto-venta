@@ -258,7 +258,7 @@ export const PosView: React.FC<PosViewProps> = ({
     setIsSavingOnly(true);
     try {
       let orderId = currentOrderId;
-      const finalCustomerName = orderType === 'delivery' ? (customerName || 'Didi') : customerName;
+      const finalCustomerName = orderType === 'delivery' ? (customerName || 'Didi') : (orderType === 'pickup' ? (customerName || 'Recolección') : customerName);
 
       if (!orderId) {
         // Create new order
@@ -303,7 +303,7 @@ export const PosView: React.FC<PosViewProps> = ({
     setIsSendingKitchen(true);
     try {
       let orderId = currentOrderId;
-      const finalCustomerName = orderType === 'delivery' ? (customerName || 'Didi') : customerName;
+      const finalCustomerName = orderType === 'delivery' ? (customerName || 'Didi') : (orderType === 'pickup' ? (customerName || 'Recolección') : customerName);
 
       if (!orderId) {
         // Create new order
@@ -349,7 +349,7 @@ export const PosView: React.FC<PosViewProps> = ({
 
     try {
       let orderId = currentOrderId;
-      const finalCustomerName = orderType === 'delivery' ? (customerName || 'Didi') : customerName;
+      const finalCustomerName = orderType === 'delivery' ? (customerName || 'Didi') : (orderType === 'pickup' ? (customerName || 'Recolección') : customerName);
       if (!orderId) {
         const newOrder = await api.createOrder({
           table_id: orderType === 'dine_in' ? selectedTableId : null,

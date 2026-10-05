@@ -1,6 +1,6 @@
 {
   "name": "pos-restaurante-backend",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Backend para Sistema POS de Restaurante en Red Local",
   "main": "dist/index.js",
   "scripts": {

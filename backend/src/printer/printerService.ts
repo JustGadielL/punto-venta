@@ -91,7 +91,7 @@ export class PrinterService {
       ? order.customer_name.trim().toUpperCase()
       : (order.type === 'dine_in'
           ? (order.table_name ? order.table_name.toUpperCase() : `MESA ${order.table_number || 'S/N'}`)
-          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN / WHATSAPP' : 'DELIVERY / APP')));
+          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN' : 'DELIVERY / APP')));
     lines.push(this.formatDivider('=', width));
     lines.push(this.formatCenter(`CLIENTE: ${clientDisplayName}`, width));
     lines.push(this.formatDivider('=', width));
@@ -316,7 +316,7 @@ export class PrinterService {
     });
     const dest = order.type === 'dine_in' 
       ? (order.table_name ? (order.table_name.toLowerCase().startsWith('mesa') ? order.table_name.toUpperCase() : `MESA: ${order.table_name.toUpperCase()}`) : (order.table_number ? `MESA: ${order.table_number}` : 'MESA S/N'))
-      : (order.type === 'take_out' ? '*** ORDEN PARA LLEVAR ***' : (order.type === 'pickup' ? '*** RECOLECCIÓN (PASAR A TRAER) ***' : '*** ORDEN POR APLICACIÓN (DELIVERY) ***'));
+      : (order.type === 'take_out' ? '*** ORDEN PARA LLEVAR ***' : (order.type === 'pickup' ? '*** RECOLECCIÓN ***' : '*** ORDEN POR APLICACIÓN (DELIVERY) ***'));
 
     const isKitchen = area === 'COCINA';
     const areaTitle = isKitchen ? 'COCINA' : 'BARRA';
@@ -327,7 +327,7 @@ export class PrinterService {
       ? order.customer_name.trim().toUpperCase()
       : (order.type === 'dine_in'
           ? (order.table_name ? order.table_name.toUpperCase() : `MESA ${order.table_number || 'S/N'}`)
-          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN / WHATSAPP' : 'DELIVERY / APP')));
+          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN' : 'DELIVERY / APP')));
 
     const lines: string[] = [];
     lines.push(this.formatDivider('=', width));
