@@ -140,7 +140,7 @@ export const ProductModifiersModal: React.FC<ProductModifiersModalProps> = ({
                           <span className={`font-bold ${qty > 0 ? 'text-white' : 'text-slate-500'}`}>{qty}</span>
                           <button 
                             type="button"
-                            onClick={() => setModifierQuantity(group, opt, Math.min(10, qty + 1))} 
+                            onClick={() => setModifierQuantity(group, opt, qty + 1)} 
                             className="w-8 h-8 rounded-lg bg-slate-800 text-white font-bold hover:bg-slate-700 active:scale-95 flex items-center justify-center transition-colors"
                           >+</button>
                         </div>

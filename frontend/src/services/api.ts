@@ -59,6 +59,7 @@ export const api = {
   checkoutOrder: (id: number, paymentData: any) => fetchJSON<{ success: boolean; message: string; order: Order; ticket: any }>(`/orders/${id}/checkout`, { method: 'POST', body: JSON.stringify(paymentData) }),
   refundOrder: (orderId: number) => fetchJSON<{ success: boolean }>(`/orders/${orderId}/refund`, { method: 'POST' }),
   cancelOrder: (id: number, reason: string) => fetchJSON<{ success: boolean; message: string }>(`/orders/${id}/cancel`, { method: 'POST', body: JSON.stringify({ reason }) }),
+  deleteOrder: (id: number) => fetchJSON<{ success: boolean; message: string }>(`/orders/${id}`, { method: 'DELETE' }),
 
   // Cash Register
   getCurrentShift: () => fetchJSON<{ active: boolean; shift: CashShift | null }>('/cash/current-shift'),

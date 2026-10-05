@@ -19,6 +19,7 @@ import { customAlert } from '../utils/alert';
 interface TablesViewProps {
   tables: Table[];
   onSelectTableForPos: (tableId: number) => void;
+  onSelectOrderForPos?: (orderId: number) => void;
   onOpenCheckout: (order: Order) => void;
   onShowTicket: (ticket: any) => void;
 }
@@ -26,6 +27,7 @@ interface TablesViewProps {
 export const TablesView: React.FC<TablesViewProps> = ({
   tables,
   onSelectTableForPos,
+  onSelectOrderForPos,
   onOpenCheckout,
   onShowTicket
 }) => {
@@ -324,7 +326,11 @@ export const TablesView: React.FC<TablesViewProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  onSelectTableForPos(activeTableDetail.table.id);
+                  if (onSelectOrderForPos && activeTableDetail.order) {
+                    onSelectOrderForPos(activeTableDetail.order.id);
+                  } else {
+                    onSelectTableForPos(activeTableDetail.table.id);
+                  }
                   setActiveTableDetail(null);
                 }}
                 className="py-3 px-2 bg-slate-700 hover:bg-slate-600 text-white rounded-2xl font-bold text-xs flex flex-col items-center justify-center gap-1 transition-colors"

@@ -156,6 +156,19 @@ router.post('/orders', (req, res) => {
     if (table_id) {
       const tableRow = db.prepare('SELECT name FROM tables WHERE id = ?').get(table_id) as any;
       if (tableRow) tableName = tableRow.name;
+
+      if (type === 'dine_in') {
+        const existingActive = db.prepare(`
+          SELECT id, order_number FROM orders 
+          WHERE table_id = ? AND status IN ('pending', 'in_preparation', 'ready')
+          LIMIT 1
+        `).get(table_id) as any;
+        if (existingActive) {
+          return res.status(400).json({ 
+            error: `La mesa ${tableName || ''} ya tiene una orden activa (#${existingActive.order_number}). Puedes seleccionarla desde Pedidos para modificarla.` 
+          });
+        }
+      }
     }
 
     const insertOrderTx = db.transaction(() => {
@@ -608,6 +621,76 @@ router.post('/orders/:id/refund', (req, res) => {
     notifyShiftUpdated(updatedShift);
 
     res.json({ success: true, message: 'Orden reembolsada' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Delete Order ---
+router.delete('/orders/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(id) as any;
+    if (!order) {
+      return res.status(404).json({ error: 'Orden no encontrada' });
+    }
+
+    const deleteTx = db.transaction(() => {
+      // 1. Delete modifier records
+      db.prepare(`
+        DELETE FROM order_item_modifiers 
+        WHERE order_item_id IN (SELECT id FROM order_items WHERE order_id = ?)
+      `).run(id);
+
+      // 2. Delete items
+      db.prepare('DELETE FROM order_items WHERE order_id = ?').run(id);
+
+      // 3. Delete payments if any
+      db.prepare('DELETE FROM payments WHERE order_id = ?').run(id);
+
+      // 4. Delete printed tickets referencing this order
+      db.prepare(`
+        DELETE FROM printed_tickets 
+        WHERE reference_id = ? AND type IN ('order_receipt', 'kitchen_comanda')
+      `).run(id);
+
+      // 5. Delete order
+      db.prepare('DELETE FROM orders WHERE id = ?').run(id);
+
+      // 6. If table_id is associated, check if other active orders exist on that table
+      if (order.table_id) {
+        const remainingActive = db.prepare(`
+          SELECT id FROM orders 
+          WHERE table_id = ? AND id != ? AND status IN ('pending', 'in_preparation', 'ready')
+          ORDER BY id DESC LIMIT 1
+        `).get(order.table_id, id) as { id: number } | undefined;
+
+        if (remainingActive) {
+          db.prepare(`
+            UPDATE tables 
+            SET active_order_id = ?, status = 'occupied', updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+          `).run(remainingActive.id, order.table_id);
+        } else {
+          db.prepare(`
+            UPDATE tables 
+            SET active_order_id = NULL, status = 'available', updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+          `).run(order.table_id);
+        }
+      }
+    });
+
+    deleteTx();
+
+    // Broadcast updates via websocket
+    notifyOrderUpdated({ id: Number(id), is_deleted: true });
+    if (order.table_id) {
+      const updatedTable = db.prepare('SELECT * FROM tables WHERE id = ?').get(order.table_id);
+      notifyTableUpdated(updatedTable);
+    }
+
+    res.json({ success: true, message: 'Orden eliminada correctamente' });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

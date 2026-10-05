@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { Order, PrintedTicket } from '../types';
-import { ClipboardList, Search, Edit2, ShoppingBag, Clock, Store, Bike, Utensils, Printer } from 'lucide-react';
+import { ClipboardList, Search, Edit2, ShoppingBag, Clock, Store, Bike, Utensils, Printer, Trash2 } from 'lucide-react';
+import { customConfirm, customAlert } from '../utils/alert';
 
 interface OrdersViewProps {
   onSelectTableForPos: (tableId: number) => void;
@@ -36,12 +37,24 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ onSelectTableForPos, onS
   }, []);
 
   const handleEditOrder = (order: Order) => {
-    if (order.table_id) {
+    if (onSelectOrderForPos) {
+      onSelectOrderForPos(order.id);
+    } else if (order.table_id) {
       onSelectTableForPos(order.table_id);
-    } else {
-      if (onSelectOrderForPos) {
-        onSelectOrderForPos(order.id);
-      }
+    }
+  };
+
+  const handleDeleteOrder = async (order: Order) => {
+    const confirmed = await customConfirm(
+      `¿Estás seguro de eliminar el pedido #${order.order_number}${order.table_name ? ` (${order.table_name})` : ''}? Esta acción cancelará y eliminará la comanda.`
+    );
+    if (!confirmed) return;
+
+    try {
+      await api.deleteOrder(order.id);
+      await loadOrders();
+    } catch (err: any) {
+      customAlert(err.message || 'Error al eliminar el pedido');
     }
   };
 
@@ -209,6 +222,16 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ onSelectTableForPos, onS
                             title="Editar Pedido"
                           >
                             <Edit2 className="w-5 h-5 text-slate-300" />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteOrder(order);
+                            }} 
+                            className="p-2.5 bg-rose-950/60 hover:bg-rose-900 border border-rose-800/60 rounded-xl transition-colors shadow text-rose-400 hover:text-rose-200" 
+                            title="Eliminar Pedido"
+                          >
+                            <Trash2 className="w-5 h-5" />
                           </button>
                           <button 
                             onClick={(e) => {

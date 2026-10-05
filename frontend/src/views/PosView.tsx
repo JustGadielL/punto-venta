@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, 
   Plus, 
@@ -71,30 +71,41 @@ export const PosView: React.FC<PosViewProps> = ({
     api.getProductModifiers().then(mappings => setProductModifierMappings(mappings)).catch(() => {});
   }, []);
 
+  const lastLoadedOrderIdRef = useRef<number | null>(null);
+
   // Sync with selected table if passed from Tables View
   useEffect(() => {
     if (selectedOrderId) {
-      loadTableOrder(selectedOrderId);
+      if (lastLoadedOrderIdRef.current !== selectedOrderId) {
+        lastLoadedOrderIdRef.current = selectedOrderId;
+        loadTableOrder(selectedOrderId);
+      }
     } else if (selectedTableId) {
+      lastLoadedOrderIdRef.current = null;
       setOrderType('dine_in');
       const table = tables.find(t => t.id === selectedTableId);
       if (table && table.active_order_id) {
-        // Load existing active order for this table
-        loadTableOrder(table.active_order_id);
+        if (currentOrderId !== table.active_order_id) {
+          loadTableOrder(table.active_order_id);
+        }
       } else {
         // New order for empty table
         if (currentOrderId !== null) {
-          // Reset only if we were previously viewing an active order
           setCurrentOrderId(null);
           setCartItems([]);
+          setCustomerName('');
+          setOrderNotes('');
         }
       }
     } else {
-      setOrderType('dine_in');
-      setCurrentOrderId(null);
-      setCartItems([]);
-      setCustomerName('');
-      setOrderNotes('');
+      lastLoadedOrderIdRef.current = null;
+      if (currentOrderId !== null) {
+        setOrderType('dine_in');
+        setCurrentOrderId(null);
+        setCartItems([]);
+        setCustomerName('');
+        setOrderNotes('');
+      }
     }
   }, [selectedTableId, selectedOrderId, tables]);
 
@@ -106,6 +117,9 @@ export const PosView: React.FC<PosViewProps> = ({
       setCustomerName(order.customer_name || '');
       setOrderNotes(order.notes || '');
       setCartItems(order.items || []);
+      if (order.table_id && order.table_id !== selectedTableId) {
+        onSelectTable(order.table_id);
+      }
     } catch (err) {
       console.error('Error loading order:', err);
     }
@@ -559,11 +573,13 @@ export const PosView: React.FC<PosViewProps> = ({
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500"
                   >
                     <option value="">-- Elegir Mesa --</option>
-                    {tables.map(t => (
-                      <option key={t.id} value={t.id}>
-                        {t.name} ({t.status === 'occupied' ? 'Ocupada' : (t.status === 'billing' ? 'Por Pagar' : 'Libre')})
-                      </option>
-                    ))}
+                    {tables
+                      .filter(t => t.status === 'available' || t.id === selectedTableId)
+                      .map(t => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
               ) : orderType === 'delivery' ? (

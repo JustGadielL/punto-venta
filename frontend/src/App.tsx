@@ -231,6 +231,7 @@ export function App() {
           <TablesView
             tables={tables}
             onSelectTableForPos={handleSelectTableForPos}
+            onSelectOrderForPos={handleSelectOrderForPos}
             onOpenCheckout={setCheckoutOrder}
             onShowTicket={handleShowTicket}
           />
