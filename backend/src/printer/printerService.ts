@@ -82,16 +82,22 @@ export class PrinterService {
     });
 
     lines.push(this.formatLine(`TICKET #${order.order_number}`, dateStr, width));
+    const isPickup = order.type === 'pickup' || 
+      (order.customer_name && (
+        order.customer_name.toUpperCase().includes('RECOGER') || 
+        order.customer_name.toUpperCase().includes('RECOLECC')
+      ));
+
     const dest = order.type === 'dine_in' 
       ? (order.table_name ? (order.table_name.toLowerCase().startsWith('mesa') ? order.table_name.toUpperCase() : `MESA: ${order.table_name.toUpperCase()}`) : (order.table_number ? `MESA: ${order.table_number}` : 'MESA S/N'))
-      : (order.type === 'take_out' ? 'PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN' : 'APP'));
+      : (order.type === 'take_out' ? 'PARA LLEVAR' : (isPickup ? 'RECOGER EN LOCAL' : 'APP'));
     lines.push(this.formatLine(`TIPO: ${dest}`, `ORDEN #${order.id}`, width));
 
     const clientDisplayName = (order.customer_name && order.customer_name.trim().length > 0)
       ? order.customer_name.trim().toUpperCase()
       : (order.type === 'dine_in'
           ? (order.table_name ? order.table_name.toUpperCase() : `MESA ${order.table_number || 'S/N'}`)
-          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN' : 'DELIVERY / APP')));
+          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (isPickup ? 'RECOGER EN LOCAL' : 'DELIVERY / APP')));
     lines.push(this.formatDivider('=', width));
     lines.push(this.formatCenter(`CLIENTE: ${clientDisplayName}`, width));
     lines.push(this.formatDivider('=', width));
@@ -314,9 +320,15 @@ export class PrinterService {
       hour12: true, 
       timeZone: 'America/Mexico_City' 
     });
+    const isPickup = order.type === 'pickup' || 
+      (order.customer_name && (
+        order.customer_name.toUpperCase().includes('RECOGER') || 
+        order.customer_name.toUpperCase().includes('RECOLECC')
+      ));
+
     const dest = order.type === 'dine_in' 
       ? (order.table_name ? (order.table_name.toLowerCase().startsWith('mesa') ? order.table_name.toUpperCase() : `MESA: ${order.table_name.toUpperCase()}`) : (order.table_number ? `MESA: ${order.table_number}` : 'MESA S/N'))
-      : (order.type === 'take_out' ? '*** ORDEN PARA LLEVAR ***' : (order.type === 'pickup' ? '*** RECOLECCIÓN ***' : '*** ORDEN POR APLICACIÓN (DELIVERY) ***'));
+      : (order.type === 'take_out' ? '*** ORDEN PARA LLEVAR ***' : (isPickup ? '*** RECOGER EN LOCAL ***' : '*** ORDEN POR APLICACIÓN (DELIVERY) ***'));
 
     const isKitchen = area === 'COCINA';
     const areaTitle = isKitchen ? 'COCINA' : 'BARRA';
@@ -327,7 +339,7 @@ export class PrinterService {
       ? order.customer_name.trim().toUpperCase()
       : (order.type === 'dine_in'
           ? (order.table_name ? order.table_name.toUpperCase() : `MESA ${order.table_number || 'S/N'}`)
-          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (order.type === 'pickup' ? 'RECOLECCIÓN' : 'DELIVERY / APP')));
+          : (order.type === 'take_out' ? 'MOSTRADOR / PARA LLEVAR' : (isPickup ? 'RECOGER EN LOCAL' : 'DELIVERY / APP')));
 
     const lines: string[] = [];
     lines.push(this.formatDivider('=', width));

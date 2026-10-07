@@ -60,7 +60,7 @@ app.use('/api', modifiersRoutes);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    version: '1.0.2',
+    version: '1.0.3',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });

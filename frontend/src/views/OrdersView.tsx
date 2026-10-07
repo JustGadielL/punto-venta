@@ -77,7 +77,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ onSelectTableForPos, onS
   const getTypeName = (type: string) => {
     if (type === 'dine_in') return 'Comedor';
     if (type === 'take_out' || type === 'takeaway') return 'Para llevar';
-    if (type === 'pickup') return 'Recoger';
+    if (type === 'pickup') return 'Recoger en Local';
     if (type === 'delivery') return 'App';
     return type;
   };
@@ -85,7 +85,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ onSelectTableForPos, onS
   const getTypeLabel = (type: string) => {
     if (type === 'dine_in') return 'Comedor';
     if (type === 'take_out' || type === 'takeaway') return 'Para Llevar';
-    if (type === 'pickup') return 'Recoger';
+    if (type === 'pickup') return 'Recoger en Local';
     if (type === 'delivery') return 'Aplicación';
     return type;
   };
